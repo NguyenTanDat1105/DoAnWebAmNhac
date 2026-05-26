@@ -366,7 +366,6 @@ public class WebController {
             return "redirect:/dang-nhap";
         }
 
-        // 🛠️ BƯỚC BỔ SUNG: Kiểm tra xem người dùng này đã từng vote bình luận này chưa
         // Sử dụng hàm có sẵn trong Repository của bạn (hoặc bạn có thể tự viết hàm tìm kiếm tương tự)
         BinhLuanVote voteDaTonTai = binhLuanVoteRepository.findByMaBinhLuanAndMaNguoiDung(maBinhLuan, userLogged.getMaNguoiDung());
         
