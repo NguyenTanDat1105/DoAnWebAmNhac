@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Hệ Thống Quản Trị - Muse Zone</title>
+    <style>
+        body { background-color: #121212; color: white; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
+        .admin-container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .header-area { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #282828; padding-bottom: 15px; margin-bottom: 25px; }
+        h1 { color: #1DB954; margin: 0; font-size: 26px; }
+        .btn-home { background: #282828; color: white; text-decoration: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: bold; border: 1px solid #444; transition: 0.2s; }
+        .btn-home:hover { background: #333; color: #1DB954; }
+        
+        .admin-table { width: 100%; border-collapse: collapse; text-align: left; background: #181818; border-radius: 8px; overflow: hidden; }
+        .admin-table th { background: #070707; color: #b3b3b3; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 14px; }
+        .admin-table td { padding: 14px; border-bottom: 1px solid #282828; font-size: 14px; }
+        
+        /* Bộ nút hành động chuyên nghiệp */
+        .action-links { display: flex; gap: 8px; }
+        .btn-edit { background: #1DB954; color: white; text-decoration: none; padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; transition: 0.2s; }
+        .btn-edit:hover { background: #1ed760; }
+        .btn-delete { background: #ff4444; color: white; text-decoration: none; padding: 5px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; transition: 0.2s; }
+        .btn-delete:hover { background: #ff6666; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <div class="header-area">
+            <h1>🎛️ TRANG QUẢN TRỊ HỆ THỐNG</h1>
+            <a href="/" class="btn-home">⬅ Về Trang Chủ</a>
+        </div>
+        
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th style="width: 8%;">ID</th>
+                    <th style="width: 32%;">Tên Bài Hát</th>
+                    <th style="width: 25%;">Ca Sĩ</th>
+                    <th style="width: 15%;">Link Video</th>
+                    <th style="width: 20%;">Hành Động</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="bh : ${listAdmin}">
+                    <td style="color: #b3b3b3;" th:text="${bh.maBaiHat}">ID</td>
+                    <td style="font-weight: bold;" th:text="${bh.tenBaiHat}">Tên bài hát</td>
+                    <td th:text="${bh.nguoiTrinhBay}">Ca sĩ</td>
+                    <td style="color: #b3b3b3; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" th:text="${bh.linkYoutube}">Link</td>
+                    <td>
+                        <div class="action-links">
+                            <a th:href="@{/sua-bai-hat/{id}(id=${bh.maBaiHat})}" class="btn-edit">Sửa</a>
+                            
+                            <a th:href="@{/delete/{id}(id=${bh.maBaiHat})}" class="btn-delete" 
+                               onclick="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn bài hát này không?')">Xóa</a>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

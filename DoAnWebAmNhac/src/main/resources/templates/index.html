@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trang Chủ - Muse Zone</title>
+    <style>
+        body { background-color: #121212; color: white; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
+        
+        /* --- CSS THANH NAVBAR ĐỘNG SIÊU ĐẸP --- */
+        .navbar { background-color: #070707; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #282828; }
+        .navbar-brand { font-size: 22px; font-weight: bold; color: #1DB954; text-decoration: none; letter-spacing: 1px; }
+        
+        .search-form { display: flex; gap: 8px; width: 35%; }
+        .search-input { width: 100%; background: #242424; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; color: white; font-size: 14px; }
+        .search-input:focus { outline: none; border-color: #1DB954; }
+        .btn-search { background: #1DB954; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-search:hover { background: #1ed760; }
+
+        .navbar-nav { display: flex; align-items: center; gap: 15px; }
+        .nav-link { color: #b3b3b3; text-decoration: none; font-weight: 500; font-size: 14px; transition: 0.2s; }
+        .nav-link:hover { color: white; }
+        .user-welcome { color: #1DB954; font-weight: bold; font-size: 14px; }
+        .btn-logout { background: #ff4444; color: white; padding: 6px 14px; border-radius: 15px; text-decoration: none; font-size: 12px; font-weight: bold; transition: 0.2s; }
+        .btn-logout:hover { background: #ff6666; }
+
+        /* --- CSS DANH SÁCH BÀI HÁT --- */
+        .main-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .page-title { font-size: 24px; border-bottom: 1px solid #282828; padding-bottom: 10px; margin-bottom: 20px; }
+        
+        .song-table { width: 100%; border-collapse: collapse; text-align: left; }
+        .song-table th { color: #b3b3b3; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 12px; border-bottom: 1px solid #282828; }
+        .song-table td { padding: 16px 12px; border-bottom: 1px solid #181818; font-size: 14px; }
+        .song-row:hover { background-color: rgba(255, 255, 255, 0.05); }
+        
+        .song-title { font-weight: bold; color: white; text-decoration: none; font-size: 15px; transition: 0.2s; }
+        .song-title:hover { color: #1DB954; }
+        .song-artist { color: #b3b3b3; font-size: 13px; margin-top: 4px; }
+        
+        .btn-play { background: #1DB954; color: white; text-decoration: none; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 12px; display: inline-block; transition: 0.2s; }
+        .btn-play:hover { background: #1ed760; transform: scale(1.04); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">🎵 MUSE ZONE</a>
+        
+        <form action="/" method="get" class="search-form">
+            <input type="text" name="tuKhoa" class="search-input" placeholder="Tìm tên bài hát hoặc ca sĩ..." th:value="${tuKhoaDaTim}">
+            <button type="submit" class="btn-search">Tìm</button>
+        </form>
+        
+        <div class="navbar-nav">
+            <th:block th:if="${userLogged == null}">
+                <a href="/dang-nhap" class="nav-link">Đăng nhập</a>
+                <a href="/dang-ky" class="nav-link" style="color: white; background: #282828; padding: 6px 14px; border-radius: 15px;">Đăng ký</a>
+            </th:block>
+            
+            <th:block th:if="${userLogged != null}">
+                <span class="user-welcome">👋 Xin chào, <span th:text="${userLogged.hoTen}">User</span></span>
+                
+                <a href="/them-bai-hat" class="nav-link" style="color: #1DB954;" th:if="${userLogged.phanQuyen == 1 || userLogged.phanQuyen == 2}">➕ Thêm bài</a>
+                
+                <a href="/admin" class="nav-link" th:if="${userLogged.phanQuyen == 2}">🎛️ Quản trị</a>
+                
+                <a href="/dang-xuat" class="btn-logout">Đăng xuất</a>
+            </th:block>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        
+        <h2 class="page-title" th:if="${tuKhoaDaTim != null}" th:text="'🔍 Kết quả tìm kiếm cho: ' + ${tuKhoaDaTim}">Danh sách tìm kiếm</h2>
+        <h2 class="page-title" th:unless="${tuKhoaDaTim != null}">🔥 Bài Hát Phổ Biến Trên Muse Zone</h2>
+        
+        <p th:if="${#lists.isEmpty(listBaiHat)}" style="color: #b3b3b3; text-align: center; margin-top: 4px;">Không tìm thấy bài hát nào phù hợp với từ khóa của bạn.</p>
+        
+        <table class="song-table" th:unless="${#lists.isEmpty(listBaiHat)}">
+            <thead>
+                <tr>
+                    <th style="width: 8%;">#</th>
+                    <th style="width: 72%;">Tiêu đề & Nghệ sĩ</th>
+                    <th style="width: 20%; text-align: center;">Nghe nhạc</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="song-row" th:each="bh, state : ${listBaiHat}">
+                    <td style="color: #b3b3b3;" th:text="${state.index + 1}">1</td>
+                    <td>
+                        <a th:href="@{/play/{id}(id=${bh.maBaiHat})}" class="song-title" th:text="${bh.tenBaiHat}">Tên bài hát</a>
+                        <div class="song-artist" th:text="${bh.nguoiTrinhBay}">Tên ca sĩ</div>
+                    </td>
+                    <td style="text-align: center;">
+                        <a th:href="@{/play/{id}(id=${bh.maBaiHat})}" class="btn-play">PHÁT</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

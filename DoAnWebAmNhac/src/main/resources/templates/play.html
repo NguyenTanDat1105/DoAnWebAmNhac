@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đang Phát - Muse Zone</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        body { background-color: #121212; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .player-container { max-width: 700px; margin: 20px auto; background: #181818; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; margin-bottom: 20px; }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        .btn-back { display: inline-block; background: #1DB954; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; margin-top: 15px; transition: 0.2s; }
+        .btn-back:hover { background: #1ed760; transform: scale(1.02); }
+        
+        /* --- CSS VOTE THỂ LOẠI --- */
+        .vote-container { max-width: 700px; margin: 20px auto; background-color: #181818; padding: 20px; border-radius: 12px; text-align: left; border: 1px solid #282828; }
+        .vote-title { color: #1DB954; margin-top: 0; font-size: 18px; display: flex; align-items: center; gap: 8px; }
+        .vote-sub { color: #b3b3b3; font-size: 13px; margin-bottom: 15px; }
+        .vote-list { display: flex; flex-wrap: wrap; gap: 10px; }
+        .btn-vote { background-color: #282828; color: white; border: 1px solid #444; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; }
+        .btn-vote:hover { border-color: #1DB954; background-color: #333; transform: scale(1.03); }
+        .vote-count { background-color: #1DB954; color: white; padding: 2px 8px; border-radius: 12px; margin-left: 6px; font-size: 11px; }
+
+        /* --- CSS HỆ THỐNG BÌNH LUẬN --- */
+        .comment-box { max-width: 700px; margin: 20px auto; background-color: #181818; padding: 20px; border-radius: 12px; text-align: left; border: 1px solid #282828; }
+        .comment-input-area { width: 100%; background: #282828; border: 1px solid #444; border-radius: 8px; color: white; padding: 12px; font-size: 14px; resize: none; box-sizing: border-box; margin-bottom: 10px; }
+        .comment-input-area:focus { outline: none; border-color: #1DB954; }
+        .btn-submit-comment { background: #1DB954; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; float: right; transition: 0.2s; }
+        .btn-submit-comment:hover { background: #1ed760; }
+        .clearfix { clear: both; }
+        
+        .comment-item { border-bottom: 1px solid #282828; padding: 15px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+        .comment-item:last-child { border-bottom: none; }
+        .comment-author { font-weight: bold; color: #1DB954; font-size: 14px; margin-bottom: 4px; }
+        .comment-time { font-size: 11px; color: #727272; margin-left: 8px; font-weight: normal; }
+        .comment-text { color: #e1e1e1; font-size: 14px; line-height: 1.4; }
+        .btn-like-comment { background: transparent; color: #b3b3b3; border: 1px solid #444; padding: 4px 10px; border-radius: 12px; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; transition: 0.2s; }
+        .btn-like-comment:hover { color: #1DB954; border-color: #1DB954; background: rgba(29, 185, 84, 0.1); }
+        
+        /* Khu vực thông báo khóa */
+        .lock-notice { background: #282828; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 25px; border: 1px dashed #555; }
+        .lock-notice a { color: #1DB954; font-weight: bold; text-decoration: none; margin-left: 5px; }
+        .lock-notice a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="player-container" th:if="${baiHat != null}">
+        <h2 style="color: #1DB954; letter-spacing: 1px;">🎵 MUSE ZONE - ĐANG PHÁT</h2>
+        <h1 th:text="${baiHat.tenBaiHat}" style="margin-bottom: 5px;">Tên bài hát</h1>
+        <p style="color: #b3b3b3; font-size: 16px; margin-top: 0;" th:text="'Trình bày: ' + ${baiHat.nguoiTrinhBay}">Ca sĩ</p>
+        
+        <div class="video-wrapper">
+		    <iframe th:src="${linkEmbed}" 
+		            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+		            allowfullscreen>
+		    </iframe>
+		</div>
+        
+        <div class="vote-container">
+            <h3 class="vote-title">🎧 Bình chọn thể loại bài hát:</h3>
+            
+            <div class="vote-list" th:if="${userLogged != null}">
+                <div th:each="tag : ${listTag}">
+                    <form th:action="@{/vote-the-loai}" method="post" style="display: inline;">
+                        <input type="hidden" name="maBaiHat" th:value="${baiHat.maBaiHat}" />
+                        <input type="hidden" name="maTag" th:value="${tag.maTag}" />
+                        <button type="submit" class="btn-vote">
+                            <span th:text="${tag.tenTag}">Thể Loại</span> 
+                            <span class="vote-count" th:text="${banDoLuotVote.get(tag.maTag)}">0</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div th:unless="${userLogged != null}">
+                <p class="vote-sub" style="color: #ff9800; font-weight: 500;">⚠️ Bạn cần <a href="/dang-nhap" style="color: #1DB954; font-weight: bold; text-decoration: underline;">Đăng nhập</a> để tham gia bình chọn thể loại!</p>
+                <div class="vote-list">
+                    <div th:each="tag : ${listTag}">
+                        <div class="btn-vote" style="cursor: not-allowed; opacity: 0.5;" title="Vui lòng đăng nhập">
+                            <span th:text="${tag.tenTag}">Thể Loại</span> 
+                            <span class="vote-count" th:text="${banDoLuotVote.get(tag.maTag)}">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="comment-box">
+            <h3 style="color: white; margin-top: 0; font-size: 18px;">💬 Bình luận cộng đồng</h3>
+            
+            <form th:action="@{/gui-binh-luan}" method="post" style="margin-bottom: 25px;" th:if="${userLogged != null}">
+                <input type="hidden" name="maBaiHat" th:value="${baiHat.maBaiHat}" />
+                <p style="color: #b3b3b3; font-size: 13px; margin-bottom: 8px; margin-top: 0;">
+                    Bình luận với tư cách: <span style="color: #1DB954; font-weight: bold;" th:text="${userLogged.hoTen}">Tên User thật</span>
+                </p>
+                <textarea class="comment-input-area" name="noiDung" rows="3" placeholder="Chia sẻ cảm nghĩ của bạn về bài hát này..."></textarea>
+                <button type="submit" class="btn-submit-comment">Gửi bình luận</button>
+                <div class="clearfix"></div>
+            </form>
+            
+            <div class="lock-notice" th:unless="${userLogged != null}">
+                <p style="margin: 0; color: #b3b3b3; font-size: 14px;">
+                    🔒 Vui lòng <a href="/dang-nhap">Đăng nhập ngay</a> để chia sẻ cảm xúc của bạn về bài hát này.
+                </p>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <p th:if="${#lists.isEmpty(listBinhLuan)}" style="color: #727272; font-size: 14px; text-align: center; padding: 10px 0;">Chưa có bình luận nào. Hãy là người đầu tiên chia sẻ cảm xúc!</p>
+                
+                <div class="comment-item" th:each="bl : ${listBinhLuan}">
+                    <div>
+                        <div class="comment-author">
+                            <span th:text="${tenNguoiBinhLuan.get(bl.maBinhLuan)}">Tên người dùng</span>
+                            <span class="comment-time" th:text="${#temporals.format(bl.ngayBinhLuan, 'dd/MM/yyyy HH:mm')}">Thời gian</span>
+                        </div>
+                        <div class="comment-text" th:text="${bl.noiDung}">Nội dung</div>
+                    </div>
+                    
+                    <div>
+                        <form th:action="@{/vote-binh-luan}" method="post" th:if="${userLogged != null}">
+                            <input type="hidden" name="maBaiHat" th:value="${baiHat.maBaiHat}" />
+                            <input type="hidden" name="maBinhLuan" th:value="${bl.maBinhLuan}" />
+                            <button type="submit" class="btn-like-comment">
+                                👍 <span th:text="${banDoVoteBinhLuan.get(bl.maBinhLuan)}">0</span>
+                            </button>
+                        </form>
+                        <div th:unless="${userLogged != null}">
+                            <button class="btn-like-comment" style="cursor: not-allowed; opacity: 0.5;" title="Bạn cần đăng nhập">
+                                👍 <span th:text="${banDoVoteBinhLuan.get(bl.maBinhLuan)}">0</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="/" class="btn-back">⬅ Quay lại danh sách</a>
+    </div>
+    
+    <div class="player-container" th:unless="${baiHat != null}">
+        <h1 style="color: #ff4444;">Lỗi: Không tìm thấy bài hát này trên Muse Zone!</h1>
+        <a href="/" class="btn-back">Quay lại trang chủ</a>
+    </div>
+	<script>
+        // Kiểm tra xem trên thanh địa chỉ URL có chứa tham số báo lỗi vote không
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('errorVote') === 'true') {
+            alert('⚠️ Bạn đã thích bình luận này rồi! Không thể bình chọn nhiều lần.');
+            
+            // Xóa tham số error trên URL đi để giao diện nhìn sạch đẹp, không bị lặp lại alert khi f5
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    </script>
+</body>
+</html>

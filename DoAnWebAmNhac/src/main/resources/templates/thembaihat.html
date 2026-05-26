@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Thêm Bài Hát Mới</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+        }
+        h2 { color: #00cc66; }
+        .form-container {
+            background-color: #262626;
+            width: 400px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 10px;
+            border: 1px solid #00cc66;
+            text-align: left;
+        }
+        label { color: #00cc66; font-weight: bold; }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background-color: #00cc66;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover { background-color: #00994c; }
+    </style>
+</head>
+<body>
+
+    <h2>Thêm Bài Hát Mới</h2>
+    
+    <div class="form-container">
+        <form th:action="@{/them-bai-hat}" th:object="${baiHatMoi}" method="post">
+            
+            <label>Tên bài hát:</label><br>
+            <input type="text" th:field="*{tenBaiHat}" placeholder="VD: Muộn Rồi Mà Sao Còn" required />
+            
+            <label>Ca sĩ trình bày:</label><br>
+            <input type="text" th:field="*{nguoiTrinhBay}" placeholder="VD: Sơn Tùng M-TP" required />
+            
+            <label>Mã ID hoặc Link Youtube:</label><br>
+            <input type="text" th:field="*{linkYoutube}" placeholder="VD: x3bfa3cBwpo" required />
+            
+            <button type="submit">Lưu Vào Database</button>
+        </form>
+    </div>
+
+</body>
+</html>

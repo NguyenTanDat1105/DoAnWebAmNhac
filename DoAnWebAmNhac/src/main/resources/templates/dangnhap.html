@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng Nhập - MuseZone</title>
+    <style>
+        body { background-color: #121212; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-container { background-color: #1a1a1a; padding: 30px; border-radius: 10px; width: 350px; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #1DB954; margin-bottom: 20px; }
+        .form-group { margin-bottom: 18px; text-align: left; }
+        label { display: block; font-size: 14px; margin-bottom: 5px; color: #b3b3b3; }
+        input { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #444; background-color: #282828; color: white; box-sizing: border-box; }
+        input:focus { border-color: #1DB954; outline: none; }
+        .btn-submit { background-color: #1DB954; color: white; font-weight: bold; width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 16px; }
+        .btn-submit:hover { background-color: #1aa34a; }
+        .msg-error { color: #ff4d4d; font-size: 14px; text-align: center; margin-bottom: 12px; }
+        .register-link { text-align: center; margin-top: 15px; font-size: 14px; }
+        .register-link a { color: #1DB954; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container">
+        <h2>Đăng Nhập</h2>
+        
+        <div class="msg-error" th:if="${error}" th:text="${error}"></div>
+
+        <form th:action="@{/dang-nhap}" method="post">
+            <div class="form-group">
+                <label>Tên đăng nhập</label>
+                <input type="text" name="txtUsername" placeholder="Nhập tài khoản của bạn..." required />
+            </div>
+            
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" name="txtPassword" placeholder="Nhập mật khẩu..." required />
+            </div>
+            
+            <button type="submit" class="btn-submit">Đăng Nhập</button>
+        </form>
+        
+        <div class="register-link">
+            Chưa có tài khoản? <a href="/dang-ky">Đăng ký ngay</a>
+        </div>
+    </div>
+
+</body>
+</html>

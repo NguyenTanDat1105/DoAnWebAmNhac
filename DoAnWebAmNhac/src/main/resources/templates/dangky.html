@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Đăng Ký Tài Khoản - MuseZone</title>
+    <style>
+        body { background-color: #121212; color: white; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .register-container { background-color: #1a1a1a; padding: 30px; border-radius: 10px; width: 350px; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #1DB954; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; font-size: 14px; margin-bottom: 5px; color: #b3b3b3; }
+        input, select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #444; background-color: #282828; color: white; box-sizing: border-box; }
+        input:focus, select:focus { border-color: #1DB954; outline: none; }
+        .btn-submit { background-color: #1DB954; color: white; font-weight: bold; width: 100%; padding: 12px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; font-size: 16px; }
+        .btn-submit:hover { background-color: #1aa34a; }
+        .msg-error { color: #ff4d4d; font-size: 14px; text-align: center; margin-bottom: 10px; }
+        .login-link { text-align: center; margin-top: 15px; font-size: 14px; }
+        .login-link a { color: #1DB954; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="register-container">
+        <h2>Tạo Tài Khoản Mới</h2>
+        
+        <div class="msg-error" th:if="${error}" th:text="${error}"></div>
+
+        <form th:action="@{/dang-ky}" th:object="${nguoiDungMoi}" method="post">
+            <div class="form-group">
+                <label>Tên Đăng Nhập (Tài khoản)</label>
+                <input type="text" th:field="*{tenDangNhap}" placeholder="Nhập tài khoản..." required />
+            </div>
+            
+            <div class="form-group">
+                <label>Mật Khẩu</label>
+                <input type="password" th:field="*{matKhau}" placeholder="Nhập mật khẩu..." required />
+            </div>
+            
+            <div class="form-group">
+                <label>Họ Và Tên (Hoặc Nghệ Danh)</label>
+                <input type="text" th:field="*{hoTen}" placeholder="Nhập họ tên của bạn..." required />
+            </div>
+            
+            <div class="form-group">
+			    <label for="phanQuyen">Bạn đăng ký với vai trò:</label>
+			    <select th:field="*{phanQuyen}" id="phanQuyen" class="form-control" required>
+			        <option value="0">Người Dùng Thường (User)</option>
+			        <option value="1">Nghệ Sĩ (Artist)</option>
+			    </select>
+			</div>
+            
+            <button type="submit" class="btn-submit">Đăng Ký Ngay</button>
+        </form>
+        
+        <div class="login-link">
+            Đã có tài khoản? <a href="/dang-nhap">Đăng nhập</a>
+        </div>
+    </div>
+
+</body>
+</html>
