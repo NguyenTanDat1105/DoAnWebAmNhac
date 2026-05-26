@@ -3,100 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <title>Trang Chủ - Muse Zone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #121212; color: white; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
-        
-        /* --- CSS THANH NAVBAR ĐỘNG SIÊU ĐẸP --- */
-        .navbar { background-color: #070707; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #282828; }
-        .navbar-brand { font-size: 22px; font-weight: bold; color: #1DB954; text-decoration: none; letter-spacing: 1px; }
-        
-        .search-form { display: flex; gap: 8px; width: 35%; }
-        .search-input { width: 100%; background: #242424; border: 1px solid #333; padding: 8px 15px; border-radius: 20px; color: white; font-size: 14px; }
-        .search-input:focus { outline: none; border-color: #1DB954; }
-        .btn-search { background: #1DB954; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .btn-search:hover { background: #1ed760; }
+        :root {
+            --bg-main: #060609;
+            --bg-card: rgba(22, 22, 34, 0.6);
+            --primary: #1DB954;
+            --primary-glow: rgba(29, 185, 84, 0.3);
+            --text-active: #ffffff;
+            --text-muted: #64748b;
+        }
 
-        .navbar-nav { display: flex; align-items: center; gap: 15px; }
-        .nav-link { color: #b3b3b3; text-decoration: none; font-weight: 500; font-size: 14px; transition: 0.2s; }
-        .nav-link:hover { color: white; }
-        .user-welcome { color: #1DB954; font-weight: bold; font-size: 14px; }
-        .btn-logout { background: #ff4444; color: white; padding: 6px 14px; border-radius: 15px; text-decoration: none; font-size: 12px; font-weight: bold; transition: 0.2s; }
-        .btn-logout:hover { background: #ff6666; }
+        *, *::before, *::after { box-sizing: border-box; }
 
-        /* --- CSS DANH SÁCH BÀI HÁT --- */
-        .main-container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
-        .page-title { font-size: 24px; border-bottom: 1px solid #282828; padding-bottom: 10px; margin-bottom: 20px; }
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-active); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(29, 185, 84, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(99, 102, 241, 0.04) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
         
+        /* --- CSS THANH NAVBAR KÍNH MỜ CHUẨN --- */
+        .navbar { 
+            background: rgba(10, 10, 15, 0.75); 
+            padding: 18px 40px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .navbar-brand { 
+            font-family: 'Syne', sans-serif;
+            font-size: 22px; 
+            font-weight: 800; 
+            color: var(--primary); 
+            text-decoration: none; 
+            letter-spacing: 1.5px; 
+        }
+        
+        .search-form { display: flex; gap: 10px; width: 35%; }
+        .search-input { 
+            width: 100%; 
+            background: rgba(255, 255, 255, 0.04); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            padding: 10px 18px; 
+            border-radius: 20px; 
+            color: white; 
+            font-size: 14px; 
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        .search-input:focus { outline: none; border-color: var(--primary); background: rgba(0,0,0,0.3); box-shadow: 0 0 15px rgba(29,185,84,0.15); }
+        
+        .btn-search { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 10px 22px; 
+            border-radius: 20px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .btn-search:hover { background: white; color: black; transform: scale(1.03); }
+        
+        .nav-right { display: flex; align-items: center; gap: 15px; }
+        .user-info { font-size: 14.5px; color: #cbd5e1; font-weight: 500; }
+        .user-info strong { color: white; font-weight: 700; }
+        
+        .btn-nav { 
+            background: rgba(255, 255, 255, 0.04); 
+            color: white; 
+            text-decoration: none; 
+            padding: 9px 18px; 
+            border-radius: 20px; 
+            font-size: 13.5px; 
+            font-weight: 600; 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.2s; 
+        }
+        .btn-nav:hover { background: var(--primary); border-color: var(--primary); box-shadow: 0 0 15px var(--primary-glow); }
+        .btn-logout { background: rgba(239, 64, 64, 0.15); color: #fca5a5; border-color: rgba(239, 64, 64, 0.2); }
+        .btn-logout:hover { background: #ef4444; color: white; border-color: #ef4444; box-shadow: 0 0 15px rgba(239,64,64,0.3); }
+
+        .main-container { max-width: 1200px; margin: 40px auto; padding: 0 24px; }
+
+        /* --- CSS BANNER CHẠY ẢNH TỰ ĐỘNG --- */
+        .carousel-container {
+            width: 100%;
+            height: 380px; 
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+            margin-bottom: 45px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .carousel-slide {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
+
+        .carousel-item {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+        }
+
+        .carousel-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(6, 6, 9, 0.9) 0%, rgba(6, 6, 9, 0.3) 50%, transparent 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 40px 50px;
+        }
+
+        .carousel-caption-tag {
+            background: var(--primary);
+            color: black;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 4px;
+            width: fit-content;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .carousel-caption-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .carousel-caption-desc {
+            color: #cbd5e1;
+            font-size: 15px;
+            margin: 0;
+            max-width: 600px;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 25px;
+            right: 50px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--primary);
+            width: 24px; 
+            border-radius: 4px;
+        }
+
+        /* --- BẢNG DANH SÁCH BÀI HÁT KÍNH MỜ --- */
+        .page-title { 
+            font-family: 'Syne', sans-serif; 
+            font-size: 24px; 
+            font-weight: 700; 
+            margin-bottom: 25px; 
+            letter-spacing: -0.5px;
+        }
+        
+        .table-responsive {
+            background: var(--bg-card); 
+            border-radius: 20px; 
+            overflow: hidden; 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+        }
+
         .song-table { width: 100%; border-collapse: collapse; text-align: left; }
-        .song-table th { color: #b3b3b3; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; padding: 12px; border-bottom: 1px solid #282828; }
-        .song-table td { padding: 16px 12px; border-bottom: 1px solid #181818; font-size: 14px; }
-        .song-row:hover { background-color: rgba(255, 255, 255, 0.05); }
         
-        .song-title { font-weight: bold; color: white; text-decoration: none; font-size: 15px; transition: 0.2s; }
-        .song-title:hover { color: #1DB954; }
-        .song-artist { color: #b3b3b3; font-size: 13px; margin-top: 4px; }
+        .song-table th { 
+            background: rgba(0, 0, 0, 0.35); 
+            color: var(--text-muted); 
+            font-size: 12px; 
+            font-weight: 700;
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            padding: 18px 24px; 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
         
-        .btn-play { background: #1DB954; color: white; text-decoration: none; padding: 6px 16px; border-radius: 20px; font-weight: bold; font-size: 12px; display: inline-block; transition: 0.2s; }
-        .btn-play:hover { background: #1ed760; transform: scale(1.04); }
+        .song-row { border-bottom: 1px solid rgba(255, 255, 255, 0.03); transition: background-color 0.2s; }
+        .song-row:hover { background-color: rgba(255, 255, 255, 0.02); }
+        .song-row:last-child { border-bottom: none; }
+        
+        .song-row td { padding: 16px 24px; vertical-align: middle; }
+        
+        .song-title { color: white; text-decoration: none; font-weight: 700; font-size: 15.5px; display: block; margin-bottom: 4px; }
+        .song-title:hover { color: var(--primary); }
+        .song-artist { color: var(--text-muted); font-size: 13.5px; font-weight: 500; }
+        
+        .btn-listen { 
+            background: rgba(29, 185, 84, 0.1); 
+            color: var(--primary); 
+            text-decoration: none; 
+            padding: 8px 18px; 
+            border-radius: 20px; 
+            font-size: 13px; 
+            font-weight: 700; 
+            border: 1px solid rgba(29, 185, 84, 0.2);
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .btn-listen:hover { background: var(--primary); color: white; box-shadow: 0 4px 12px var(--primary-glow); transform: translateY(-1px); }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
+    <div class="navbar">
         <a href="/" class="navbar-brand">🎵 MUSE ZONE</a>
         
         <form action="/" method="get" class="search-form">
-            <input type="text" name="tuKhoa" class="search-input" placeholder="Tìm tên bài hát hoặc ca sĩ..." th:value="${tuKhoaDaTim}">
-            <button type="submit" class="btn-search">Tìm</button>
+            <input type="text" name="txtSearch" class="search-input" th:value="${tuKhoaDaTim}" placeholder="Tìm bài hát hoặc nghệ sĩ bạn yêu thích..." required />
+            <button type="submit" class="btn-search">Tìm Kiếm</button>
         </form>
         
-        <div class="navbar-nav">
-            <th:block th:if="${userLogged == null}">
-                <a href="/dang-nhap" class="nav-link">Đăng nhập</a>
-                <a href="/dang-ky" class="nav-link" style="color: white; background: #282828; padding: 6px 14px; border-radius: 15px;">Đăng ký</a>
-            </th:block>
+        <div class="nav-right">
+            <div th:if="${userLogged != null}" style="display: flex; align-items: center; gap: 12px;">
+                <span class="user-info" style="margin-right: 8px;">Xin chào, <strong th:text="${userLogged.hoTen}">Người dùng</strong> ✨</span>
+                
+                <a th:if="${userLogged.phanQuyen == 1 or userLogged.tenDangNhap == 'admin'}" href="/them-bai-hat" class="btn-nav" style="background: rgba(29, 185, 84, 0.15); border-color: var(--primary); color: #26e66b;">➕ Thêm Bài</a>
+                
+                <a th:if="${userLogged.tenDangNhap == 'admin'}" href="/admin" class="btn-nav" style="border-color: #6366f1; color: #818cf8;">🎛️ Quản Trị</a>
+                
+                <a href="/dang-xuat" class="btn-nav btn-logout">Đăng Xuất</a>
+            </div>
             
-            <th:block th:if="${userLogged != null}">
-                <span class="user-welcome">👋 Xin chào, <span th:text="${userLogged.hoTen}">User</span></span>
-                
-                <a href="/them-bai-hat" class="nav-link" style="color: #1DB954;" th:if="${userLogged.phanQuyen == 1 || userLogged.phanQuyen == 2}">➕ Thêm bài</a>
-                
-                <a href="/admin" class="nav-link" th:if="${userLogged.phanQuyen == 2}">🎛️ Quản trị</a>
-                
-                <a href="/dang-xuat" class="btn-logout">Đăng xuất</a>
-            </th:block>
+            <div th:unless="${userLogged != null}">
+                <a href="/dang-nhap" class="btn-nav">Đăng Nhập</a>
+                <a href="/dang-ky" class="btn-nav" style="background: var(--primary); border-color: var(--primary);">Đăng Ký</a>
+            </div>
         </div>
-    </nav>
+    </div>
 
     <div class="main-container">
-        
+    
+        <div class="carousel-container" th:if="${tuKhoaDaTim == null}">
+            <div class="carousel-slide" id="carouselSlide">
+                <div class="carousel-item">
+                    <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1200&auto=format&fit=crop" alt="Banner 1">
+                    <div class="carousel-overlay">
+                        <span class="carousel-caption-tag">Đặc Quyền Nghệ Sĩ</span>
+                        <h3 class="carousel-caption-title">Không Gian Âm Nhạc Đích Thực</h3>
+                        <p class="carousel-caption-desc">Nơi kết nối những tâm hồn đồng điệu qua từng giai điệu, câu từ đầy cảm xúc bùng nổ.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1200&auto=format&fit=crop" alt="Banner 2">
+                    <div class="carousel-overlay">
+                        <span class="carousel-caption-tag">Trending Now</span>
+                        <h3 class="carousel-caption-title">Giai Điệu Thịnh Hành</h3>
+                        <p class="carousel-caption-desc">Cập nhật liên tục những siêu phẩm âm nhạc mới nhất từ các nghệ sĩ đình đám toàn thế giới.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?q=80&w=1200&auto=format&fit=crop" alt="Banner 3">
+                    <div class="carousel-overlay">
+                        <span class="carousel-caption-tag">Studio Live</span>
+                        <h3 class="carousel-caption-title">Thế Giới Nghệ Thuật VIP</h3>
+                        <p class="carousel-caption-desc">Hòa mình vào âm hưởng chất lượng cao Sound-Studio cực căng, nâng tầm trải nghiệm của bạn.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-dots">
+                <div class="dot active" onclick="jumpToSlide(0)"></div>
+                <div class="dot" onclick="jumpToSlide(1)"></div>
+                <div class="dot" onclick="jumpToSlide(2)"></div>
+            </div>
+        </div>
+
         <h2 class="page-title" th:if="${tuKhoaDaTim != null}" th:text="'🔍 Kết quả tìm kiếm cho: ' + ${tuKhoaDaTim}">Danh sách tìm kiếm</h2>
         <h2 class="page-title" th:unless="${tuKhoaDaTim != null}">🔥 Bài Hát Phổ Biến Trên Muse Zone</h2>
         
-        <p th:if="${#lists.isEmpty(listBaiHat)}" style="color: #b3b3b3; text-align: center; margin-top: 4px;">Không tìm thấy bài hát nào phù hợp với từ khóa của bạn.</p>
+        <p th:if="${#lists.isEmpty(listBaiHat)}" style="color: var(--text-muted); text-align: center; margin-top: 20px;">Không tìm thấy bài hát nào phù hợp với từ khóa của bạn.</p>
         
-        <table class="song-table" th:unless="${#lists.isEmpty(listBaiHat)}">
-            <thead>
-                <tr>
-                    <th style="width: 8%;">#</th>
-                    <th style="width: 72%;">Tiêu đề & Nghệ sĩ</th>
-                    <th style="width: 20%; text-align: center;">Nghe nhạc</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="song-row" th:each="bh, state : ${listBaiHat}">
-                    <td style="color: #b3b3b3;" th:text="${state.index + 1}">1</td>
-                    <td>
-                        <a th:href="@{/play/{id}(id=${bh.maBaiHat})}" class="song-title" th:text="${bh.tenBaiHat}">Tên bài hát</a>
-                        <div class="song-artist" th:text="${bh.nguoiTrinhBay}">Tên ca sĩ</div>
-                    </td>
-                    <td style="text-align: center;">
-                        <a th:href="@{/play/{id}(id=${bh.maBaiHat})}" class="btn-play">PHÁT</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive" th:unless="${#lists.isEmpty(listBaiHat)}">
+            <table class="song-table">
+                <thead>
+                    <tr>
+                        <th style="width: 8%; text-align: center;">#</th>
+                        <th style="width: 72%;">Tiêu đề & Nghệ sĩ</th>
+                        <th style="width: 20%; text-align: center;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="song-row" th:each="bh, state : ${listBaiHat}">
+                        <td style="color: var(--text-muted); font-weight: 600; text-align: center;" th:text="${state.index + 1}">1</td>
+                        <td>
+                            <a th:href="@{/play/{id}(id=${bh.maBaiHat})}" class="song-title" th:text="${bh.tenBaiHat}">Tên bài hát</a>
+                            <div class="song-artist" th:text="${bh.nguoiTrinhBay}">Tên ca sĩ</div>
+                        </td>
+                        <td style="text-align: center;">
+                            <a th:href="@{/play/{id}(id=${bh.maBaiHat})}" class="btn-listen">▶ Nghe Ngay</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <script th:if="${tuKhoaDaTim == null}">
+        const slide = document.getElementById('carouselSlide');
+        const dots = document.querySelectorAll('.dot');
+        let currentIndex = 0;
+        const totalSlides = dots.length;
+        const intervalTime = 4000; 
+        let slideTimer;
+
+        function updateCarousel() {
+            slide.style.transform = `translateX(-${currentIndex * 100}%)`;
+            dots.forEach((dot, index) => {
+                if(index === currentIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateCarousel();
+        }
+
+        function startTimer() {
+            slideTimer = setInterval(nextSlide, intervalTime);
+        }
+
+        function jumpToSlide(index) {
+            clearInterval(slideTimer); 
+            currentIndex = index;
+            updateCarousel();
+            startTimer(); 
+        }
+
+        startTimer();
+    </script>
 
 </body>
 </html>

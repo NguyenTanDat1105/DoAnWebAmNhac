@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import clc65.nguyentandat.DoAnWebAmNhac.Repository.BaiHatRepository;
 import clc65.nguyentandat.DoAnWebAmNhac.Repository.NguoiDungRepository;
@@ -147,12 +149,11 @@ public class WebController {
     // 3. QUẢN LÝ BÀI HÁT (FULL CRUD - PHÂN QUYỀN AN TOÀN)
     // ==========================================
     
- // --- CHỨC NĂNG: THÊM BÀI HÁT (BẢO MẬT: CHỈ NGHỆ SĨ CHỈ SỐ 1 VÀ ADMIN CHỈ SỐ 2) ---
+    // --- CHỨC NĂNG: THÊM BÀI HÁT (BẢO MẬT: CHỈ NGHỆ SĨ CHỈ SỐ 1 VÀ ADMIN CHỈ SỐ 2) ---
     @GetMapping("/them-bai-hat")
     public String showFormThem(ModelMap m, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
         
-        // 🛑 ĐÃ SỬA: Nếu chưa đăng nhập HOẶC là Người dùng thường (quyen == 0) -> Đá văng về trang đăng nhập hoặc trang chủ
         if (userLogged == null || userLogged.getPhanQuyen() == 0) {
             return "redirect:/dang-nhap";
         }
@@ -165,7 +166,6 @@ public class WebController {
     public String saveBaiHat(@ModelAttribute("baiHatMoi") BaiHat baiHat, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
         
-        // 🛑 ĐÃ SỬA: Chặn luôn ở đầu nhận dữ liệu từ Form để đảm bảo an toàn tuyệt đối
         if (userLogged == null || userLogged.getPhanQuyen() == 0) {
             return "redirect:/dang-nhap";
         }
@@ -180,7 +180,6 @@ public class WebController {
     public String showFormSua(@PathVariable("id") Integer id, ModelMap m, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
         
-        // 🛠️ ĐÃ SỬA: Nếu không đăng nhập HOẶC không phải quyền số 2 (Admin) -> Trục xuất về trang chủ
         if (userLogged == null || userLogged.getPhanQuyen() != 2) {
             return "redirect:/";
         }
@@ -198,7 +197,6 @@ public class WebController {
     public String thucHienCapNhat(@ModelAttribute("baiHatCanSua") BaiHat baiHat, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
         
-        // 🛠️ ĐÃ SỬA: Đảm bảo chỉ quyền số 2 (Admin) mới có quyền gửi form lưu dữ liệu cập nhật
         if (userLogged == null || userLogged.getPhanQuyen() != 2) {
             return "redirect:/";
         }
@@ -213,7 +211,6 @@ public class WebController {
     public String showAdminPage(ModelMap m, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
         
-        // 🛠️ ĐÃ SỬA: Chỉ cho phép tài khoản mang quyền số 2 (Admin thực tế trong DB) truy cập
         if (userLogged == null || userLogged.getPhanQuyen() != 2) {
             return "redirect:/";
         }
@@ -228,7 +225,6 @@ public class WebController {
     public String deleteBaiHat(@PathVariable("id") Integer id, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
         
-        // 🛠️ ĐÃ SỬA: Chặn đứng hành vi tự gõ link url xóa bừa bãi, chỉ cho quyền số 2 thực thi
         if (userLogged == null || userLogged.getPhanQuyen() != 2) {
             return "redirect:/";
         }
@@ -248,27 +244,21 @@ public class WebController {
 
     @PostMapping("/dang-ky")
     public String thucHienDangKy(@ModelAttribute("nguoiDungMoi") NguoiDung user, ModelMap m) {
-        // 1. Kiểm tra tài khoản trùng lặp
         NguoiDung checkTontai = nguoiDungRepository.findByTenDangNhap(user.getTenDangNhap());
         if (checkTontai != null) {
             m.addAttribute("error", "Tên đăng nhập này đã tồn tại trên hệ thống!");
             return "dangky"; 
         }
         
-        // 2. Thiết lập các thông số thời gian và ảnh đại diện mặc định
         user.setNgayTao(LocalDateTime.now()); 
         user.setAnhDaiDien("default_avatar.png"); 
         
-        // 🛠️ SỬA LẠI TẠI ĐÂY: Xử lý nhận quyền động từ Form giao diện gửi lên
-        // Nếu trên giao diện người dùng không chọn hoặc bằng null, hệ thống mới gán mặc định là 0
         if (user.getPhanQuyen() == null) {
             user.setPhanQuyen(0); 
         } else if (user.getPhanQuyen() == 2) {
-            // 🔒 BẢO MẬT: Ngăn chặn tuyệt đối việc hacker cố tình sửa code HTML của Form để tự đăng ký quyền Admin (2)
             user.setPhanQuyen(0); 
         }
         
-        // 3. Tiến hành lưu xuống Cơ sở dữ liệu
         nguoiDungRepository.save(user);
         return "redirect:/dang-nhap";
     }
@@ -327,62 +317,77 @@ public class WebController {
     }
 
     // ==========================================
-    // 7. XỬ LÝ THÊM BÌNH LUẬN MỚI
+    // ✨ 7. XỬ LÝ THÊM BÌNH LUẬN MỚI QUA AJAX (ĐÃ NÂNG CẤP)
     // ==========================================
     @PostMapping("/gui-binh-luan")
-    public String guiBinhLuan(@RequestParam("maBaiHat") Integer maBaiHat,
-                              @RequestParam("noiDung") String noiDung,
-                              HttpSession session) {
+    @ResponseBody // 👈 Trả dữ liệu thuần JSON ngầm, ngăn chặn reload trang
+    public ResponseEntity<?> guiBinhLuan(@RequestParam("maBaiHat") Integer maBaiHat,
+                                         @RequestParam("noiDung") String noiDung,
+                                         HttpSession session) {
         if (noiDung == null || noiDung.trim().isEmpty()) {
-            return "redirect:/play/" + maBaiHat;
+            return ResponseEntity.badRequest().body("Nội dung không được để trống");
         }
 
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
         if (userLogged == null) {
-            return "redirect:/dang-nhap";
+            return ResponseEntity.status(401).body("Bạn chưa đăng nhập!");
         }
 
+        // Tạo mới và lưu thực thể Bình Luận
         BinhLuan bl = new BinhLuan();
         bl.setMaBaiHat(maBaiHat);
         bl.setMaNguoiDung(userLogged.getMaNguoiDung()); 
         bl.setNoiDung(noiDung.trim());
         bl.setNgayBinhLuan(LocalDateTime.now());
+        BinhLuan savedBl = binhLuanRepository.save(bl);
 
-        binhLuanRepository.save(bl);
-        return "redirect:/play/" + maBaiHat;
+        // Đóng gói dữ liệu trả về cho JavaScript phía Giao diện tự render
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("maBinhLuan", savedBl.getMaBinhLuan()); // Gửi mã bình luận mới để có thể Like ngay
+        response.put("hoTen", userLogged.getHoTen());
+        response.put("noiDung", savedBl.getNoiDung());
+        
+        return ResponseEntity.ok(response);
     }
 
- // ==========================================
-    // 8. XỬ LÝ THÍCH (UPVOTE) BÌNH LUẬN - CHỐNG SPAM VOTE NHIỀU LẦN
+    // ==========================================
+    // ✨ 8. XỬ LÝ THÍCH BÌNH LUẬN QUA AJAX (ĐÃ NÂNG CẤP)
     // ==========================================
     @PostMapping("/vote-binh-luan")
-    public String voteBinhLuan(@RequestParam("maBaiHat") Integer maBaiHat,
-                               @RequestParam("maBinhLuan") Integer maBinhLuan,
-                               HttpSession session,
-                               ModelMap m) {
+    @ResponseBody // 👈 Trả dữ liệu thuần JSON ngầm, ngăn chặn reload trang
+    public ResponseEntity<?> voteBinhLuan(@RequestParam("maBinhLuan") Integer maBinhLuan,
+                                          HttpSession session) {
         
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
         if (userLogged == null) {
-            return "redirect:/dang-nhap";
+            return ResponseEntity.status(401).body("Bạn chưa đăng nhập!");
         }
 
-        // Sử dụng hàm có sẵn trong Repository của bạn (hoặc bạn có thể tự viết hàm tìm kiếm tương tự)
+        // Kiểm tra xem user này đã thích bình luận này trong DB chưa
         BinhLuanVote voteDaTonTai = binhLuanVoteRepository.findByMaBinhLuanAndMaNguoiDung(maBinhLuan, userLogged.getMaNguoiDung());
         
         if (voteDaTonTai != null) {
-            // 🛑 NẾU ĐÃ VOTE RỒI: Không lưu nữa và chuyển hướng về trang nghe nhạc với tín hiệu báo lỗi
-            // Cách xử lý đơn giản và trực quan nhất là truyền một tham số báo lỗi lên URL
-            return "redirect:/play/" + maBaiHat + "?errorVote=true";
+            // Trả lỗi 400 nếu trùng lặp để JavaScript bắt và hiển thị Alert cảnh báo
+            return ResponseEntity.badRequest().body("Bạn đã thích bình luận này rồi!");
         }
 
-        // NẾU CHƯA VOTE: Tiến hành lưu lượt vote mới như bình thường
+        // Nếu hợp lệ, lưu vào database
         BinhLuanVote blVote = new BinhLuanVote();
         blVote.setMaBinhLuan(maBinhLuan);
         blVote.setMaNguoiDung(userLogged.getMaNguoiDung()); 
         blVote.setIsUpvote(1); 
         blVote.setNgayVote(LocalDateTime.now());
-
         binhLuanVoteRepository.save(blVote);
-        return "redirect:/play/" + maBaiHat;
+
+        // Tính toán lại tổng lượt vote mới nhất sau khi cộng thành công
+        int soUpvoteMoi = binhLuanVoteRepository.countByMaBinhLuanAndIsUpvote(maBinhLuan, 1);
+
+        // Trả kết quả số lượng mới về cho Client
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("newLikeCount", soUpvoteMoi);
+        
+        return ResponseEntity.ok(response);
     }
 }

@@ -3,52 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <title>Đang Phát - Muse Zone</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #121212; color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .player-container { max-width: 700px; margin: 20px auto; background: #181818; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; margin-bottom: 20px; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-        .btn-back { display: inline-block; background: #1DB954; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; margin-top: 15px; transition: 0.2s; }
-        .btn-back:hover { background: #1ed760; transform: scale(1.02); }
-        
-        /* --- CSS VOTE THỂ LOẠI --- */
-        .vote-container { max-width: 700px; margin: 20px auto; background-color: #181818; padding: 20px; border-radius: 12px; text-align: left; border: 1px solid #282828; }
-        .vote-title { color: #1DB954; margin-top: 0; font-size: 18px; display: flex; align-items: center; gap: 8px; }
-        .vote-sub { color: #b3b3b3; font-size: 13px; margin-bottom: 15px; }
-        .vote-list { display: flex; flex-wrap: wrap; gap: 10px; }
-        .btn-vote { background-color: #282828; color: white; border: 1px solid #444; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; display: inline-flex; align-items: center; }
-        .btn-vote:hover { border-color: #1DB954; background-color: #333; transform: scale(1.03); }
-        .vote-count { background-color: #1DB954; color: white; padding: 2px 8px; border-radius: 12px; margin-left: 6px; font-size: 11px; }
+        :root {
+            --bg-main: #060609;
+            --bg-card: rgba(22, 22, 34, 0.6);
+            --bg-card-hover: rgba(30, 30, 47, 0.9);
+            --primary: #1DB954;
+            --primary-glow: rgba(29, 185, 84, 0.4);
+            --accent: #6366f1;
+            --text-active: #ffffff;
+            --text-muted: #64748b;
+            --text-low: #475569;
+            --gradient-accent: linear-gradient(135deg, #1DB954 0%, #10b981 50%, #6366f1 100%);
+        }
 
-        /* --- CSS HỆ THỐNG BÌNH LUẬN --- */
-        .comment-box { max-width: 700px; margin: 20px auto; background-color: #181818; padding: 20px; border-radius: 12px; text-align: left; border: 1px solid #282828; }
-        .comment-input-area { width: 100%; background: #282828; border: 1px solid #444; border-radius: 8px; color: white; padding: 12px; font-size: 14px; resize: none; box-sizing: border-box; margin-bottom: 10px; }
-        .comment-input-area:focus { outline: none; border-color: #1DB954; }
-        .btn-submit-comment { background: #1DB954; color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; float: right; transition: 0.2s; }
-        .btn-submit-comment:hover { background: #1ed760; }
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body { 
+            background-color: var(--bg-main); 
+            color: var(--text-active); 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; 
+            padding: 0;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 85% 15%, rgba(29, 185, 84, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 15% 70%, rgba(99, 102, 241, 0.05) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        /* --- BỐ CỤC CONTAINER CHÍNH --- */
+        .player-container { 
+            max-width: 760px; 
+            margin: 50px auto; 
+            background: var(--bg-card); 
+            padding: 35px; 
+            border-radius: 24px; 
+            text-align: center; 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 40px rgba(29, 185, 84, 0.03);
+        }
+
+        .brand-sub {
+            font-family: 'Syne', sans-serif;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .song-title-main {
+            font-family: 'Syne', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, #fff 0%, #e2e8f0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .song-artist-main {
+            color: var(--text-muted);
+            font-size: 16px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-weight: 500;
+        }
+
+        /* --- KHUNG VIDEO PHÁT SÁNG NEON --- */
+        .video-wrapper { 
+            position: relative; 
+            padding-bottom: 56.25%; 
+            height: 0; 
+            overflow: hidden; 
+            border-radius: 16px; 
+            margin-bottom: 30px; 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5), 0 0 30px rgba(29, 185, 84, 0.15);
+            transition: transform 0.3s ease;
+        }
+        .video-wrapper:hover {
+            transform: scale(1.01);
+        }
+        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        /* --- KHU VỰC BÌNH CHỌN THỂ LOẠI --- */
+        .vote-container { 
+            background-color: rgba(255, 255, 255, 0.02); 
+            padding: 24px; 
+            border-radius: 16px; 
+            text-align: left; 
+            border: 1px solid rgba(255, 255, 255, 0.04); 
+            margin-bottom: 25px;
+        }
+        .vote-title { 
+            color: var(--text-active); 
+            margin-top: 0; 
+            font-size: 16.5px; 
+            font-weight: 700;
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+        }
+        .vote-sub { color: var(--text-muted); font-size: 13.5px; margin-bottom: 15px; }
+        .vote-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        
+        .btn-vote { 
+            background-color: rgba(255, 255, 255, 0.03); 
+            color: var(--text-muted); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            padding: 8px 18px; 
+            border-radius: 30px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 13px; 
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
+            display: inline-flex; 
+            align-items: center; 
+        }
+        .btn-vote:hover { 
+            border-color: var(--primary); 
+            background-color: rgba(29, 185, 84, 0.06); 
+            color: white;
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 15px rgba(29, 185, 84, 0.15);
+        }
+        .vote-count { 
+            background: rgba(255, 255, 255, 0.08); 
+            color: var(--text-active); 
+            padding: 2px 8px; 
+            border-radius: 12px; 
+            margin-left: 8px; 
+            font-size: 11px; 
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .btn-vote:hover .vote-count {
+            background: var(--primary);
+        }
+
+        /* --- HỆ THỐNG BÌNH LUẬN STUDIO PREMIUM --- */
+        .comment-box { 
+            background-color: rgba(255, 255, 255, 0.02); 
+            padding: 24px; 
+            border-radius: 16px; 
+            text-align: left; 
+            border: 1px solid rgba(255, 255, 255, 0.04); 
+            margin-bottom: 30px;
+        }
+        .comment-input-area { 
+            width: 100%; 
+            background: rgba(0, 0, 0, 0.2); 
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-radius: 12px; 
+            color: white; 
+            padding: 14px; 
+            font-size: 14px; 
+            font-family: inherit;
+            resize: none; 
+            box-sizing: border-box; 
+            margin-bottom: 12px; 
+            transition: all 0.3s ease;
+        }
+        .comment-input-area:focus { 
+            outline: none; 
+            border-color: var(--accent); 
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+        }
+        
+        .btn-submit-comment { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 9px 24px; 
+            border-radius: 30px; 
+            font-weight: 700; 
+            font-size: 13px;
+            cursor: pointer; 
+            float: right; 
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1); 
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+        .btn-submit-comment:hover { 
+            background: var(--text-active); 
+            color: var(--bg-main); 
+            box-shadow: 0 8px 22px rgba(255, 255, 255, 0.35);
+            transform: translateY(-2px);
+        }
         .clearfix { clear: both; }
         
-        .comment-item { border-bottom: 1px solid #282828; padding: 15px 0; display: flex; justify-content: space-between; align-items: flex-start; }
+        .comment-item { 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04); 
+            padding: 16px 4px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+        }
         .comment-item:last-child { border-bottom: none; }
-        .comment-author { font-weight: bold; color: #1DB954; font-size: 14px; margin-bottom: 4px; }
-        .comment-time { font-size: 11px; color: #727272; margin-left: 8px; font-weight: normal; }
-        .comment-text { color: #e1e1e1; font-size: 14px; line-height: 1.4; }
-        .btn-like-comment { background: transparent; color: #b3b3b3; border: 1px solid #444; padding: 4px 10px; border-radius: 12px; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; transition: 0.2s; }
-        .btn-like-comment:hover { color: #1DB954; border-color: #1DB954; background: rgba(29, 185, 84, 0.1); }
         
-        /* Khu vực thông báo khóa */
-        .lock-notice { background: #282828; padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 25px; border: 1px dashed #555; }
-        .lock-notice a { color: #1DB954; font-weight: bold; text-decoration: none; margin-left: 5px; }
-        .lock-notice a:hover { text-decoration: underline; }
+        .comment-author { 
+            font-weight: 700; 
+            font-size: 14.5px; 
+            margin-bottom: 6px; 
+            background: linear-gradient(90deg, #1DB954, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-flex;
+            align-items: center;
+        }
+        .comment-time { 
+            font-size: 11px; 
+            color: var(--text-muted); 
+            margin-left: 10px; 
+            font-weight: 500; 
+            -webkit-text-fill-color: initial; 
+        }
+        .comment-text { color: #e2e8f0; font-size: 14px; line-height: 1.5; }
+        
+        .btn-like-comment { 
+            background: rgba(255, 255, 255, 0.02); 
+            color: var(--text-muted); 
+            border: 1px solid rgba(255, 255, 255, 0.06); 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-size: 12px; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            font-weight: 600;
+            transition: all 0.2s ease; 
+        }
+        .btn-like-comment:hover { 
+            color: var(--primary); 
+            border-color: rgba(29, 185, 84, 0.3); 
+            background: rgba(29, 185, 84, 0.08); 
+            box-shadow: 0 4px 12px rgba(29, 185, 84, 0.15);
+            transform: scale(1.05);
+        }
+        
+        .lock-notice { 
+            background: rgba(255, 255, 255, 0.01); 
+            padding: 16px; 
+            border-radius: 12px; 
+            text-align: center; 
+            margin-bottom: 20px; 
+            border: 1px dashed rgba(255, 255, 255, 0.1); 
+        }
+        .lock-notice p { margin: 0; color: var(--text-muted); font-size: 13.5px; }
+        .lock-notice a { color: var(--primary); font-weight: 700; text-decoration: none; margin-left: 4px; transition: color 0.2s; }
+        .lock-notice a:hover { text-decoration: underline; color: #1ed760; }
+
+        .btn-back { 
+            display: inline-block; 
+            background: rgba(255, 255, 255, 0.04); 
+            color: var(--text-active); 
+            padding: 10px 24px; 
+            border-radius: 30px; 
+            text-decoration: none; 
+            font-weight: 700; 
+            font-size: 13.5px;
+            margin-top: 15px; 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease; 
+        }
+        .btn-back:hover { 
+            background: var(--text-active); 
+            color: var(--bg-main); 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
 
     <div class="player-container" th:if="${baiHat != null}">
-        <h2 style="color: #1DB954; letter-spacing: 1px;">🎵 MUSE ZONE - ĐANG PHÁT</h2>
-        <h1 th:text="${baiHat.tenBaiHat}" style="margin-bottom: 5px;">Tên bài hát</h1>
-        <p style="color: #b3b3b3; font-size: 16px; margin-top: 0;" th:text="'Trình bày: ' + ${baiHat.nguoiTrinhBay}">Ca sĩ</p>
+        <div class="brand-sub">🎵 Muse Zone Player</div>
+        <h1 class="song-title-main" th:text="${baiHat.tenBaiHat}">Tên bài hát</h1>
+        <p class="song-artist-main" th:text="'Nghệ sĩ: ' + ${baiHat.nguoiTrinhBay}">Ca sĩ</p>
         
         <div class="video-wrapper">
 		    <iframe th:src="${linkEmbed}" 
@@ -58,7 +297,7 @@
 		</div>
         
         <div class="vote-container">
-            <h3 class="vote-title">🎧 Bình chọn thể loại bài hát:</h3>
+            <h3 class="vote-title">🎧 Định hình thể loại bài hát:</h3>
             
             <div class="vote-list" th:if="${userLogged != null}">
                 <div th:each="tag : ${listTag}">
@@ -74,10 +313,10 @@
             </div>
             
             <div th:unless="${userLogged != null}">
-                <p class="vote-sub" style="color: #ff9800; font-weight: 500;">⚠️ Bạn cần <a href="/dang-nhap" style="color: #1DB954; font-weight: bold; text-decoration: underline;">Đăng nhập</a> để tham gia bình chọn thể loại!</p>
+                <p class="vote-sub" style="color: #f59e0b; font-weight: 500;">⚠️ Bạn cần <a href="/dang-nhap" style="color: var(--primary); font-weight: 700; text-decoration: underline;">Đăng nhập</a> để tham gia bình chọn thể loại!</p>
                 <div class="vote-list">
                     <div th:each="tag : ${listTag}">
-                        <div class="btn-vote" style="cursor: not-allowed; opacity: 0.5;" title="Vui lòng đăng nhập">
+                        <div class="btn-vote" style="cursor: not-allowed; opacity: 0.4;" title="Vui lòng đăng nhập">
                             <span th:text="${tag.tenTag}">Thể Loại</span> 
                             <span class="vote-count" th:text="${banDoLuotVote.get(tag.maTag)}">0</span>
                         </div>
@@ -87,26 +326,26 @@
         </div>
 
         <div class="comment-box">
-            <h3 style="color: white; margin-top: 0; font-size: 18px;">💬 Bình luận cộng đồng</h3>
+            <h3 style="color: white; margin-top: 0; font-size: 17px; font-weight: 700;">💬 Bình luận cộng đồng</h3>
             
-            <form th:action="@{/gui-binh-luan}" method="post" style="margin-bottom: 25px;" th:if="${userLogged != null}">
-                <input type="hidden" name="maBaiHat" th:value="${baiHat.maBaiHat}" />
-                <p style="color: #b3b3b3; font-size: 13px; margin-bottom: 8px; margin-top: 0;">
-                    Bình luận với tư cách: <span style="color: #1DB954; font-weight: bold;" th:text="${userLogged.hoTen}">Tên User thật</span>
+            <form id="ajaxCommentForm" th:action="@{/gui-binh-luan}" method="post" style="margin-bottom: 30px;" th:if="${userLogged != null}">
+                <input type="hidden" id="commentSongId" name="maBaiHat" th:value="${baiHat.maBaiHat}" />
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 8px; margin-top: 0; font-weight: 500;">
+                    Chia sẻ cảm xúc làm: <span style="color: var(--primary); font-weight: 700;" th:text="${userLogged.hoTen}">Tên User thật</span>
                 </p>
-                <textarea class="comment-input-area" name="noiDung" rows="3" placeholder="Chia sẻ cảm nghĩ của bạn về bài hát này..."></textarea>
+                <textarea id="commentContentText" class="comment-input-area" name="noiDung" rows="3" placeholder="Giai điệu này để lại cho bạn ấn tượng gì..." required></textarea>
                 <button type="submit" class="btn-submit-comment">Gửi bình luận</button>
                 <div class="clearfix"></div>
             </form>
             
             <div class="lock-notice" th:unless="${userLogged != null}">
-                <p style="margin: 0; color: #b3b3b3; font-size: 14px;">
-                    🔒 Vui lòng <a href="/dang-nhap">Đăng nhập ngay</a> để chia sẻ cảm xúc của bạn về bài hát này.
+                <p>
+                    🔒 Hãy <a href="/dang-nhap">Đăng nhập ngay</a> để tham gia thảo luận cùng cộng đồng Muse Zone.
                 </p>
             </div>
             
-            <div style="margin-top: 15px;">
-                <p th:if="${#lists.isEmpty(listBinhLuan)}" style="color: #727272; font-size: 14px; text-align: center; padding: 10px 0;">Chưa có bình luận nào. Hãy là người đầu tiên chia sẻ cảm xúc!</p>
+            <div id="commentsListContainer" style="margin-top: 15px;">
+                <p id="noCommentText" th:if="${#lists.isEmpty(listBinhLuan)}" style="color: var(--text-muted); font-size: 13.5px; text-align: center; padding: 20px 0; font-weight: 500;">Chưa có bình luận nào. Hãy là người đầu tiên khơi nguồn cảm xúc!</p>
                 
                 <div class="comment-item" th:each="bl : ${listBinhLuan}">
                     <div>
@@ -118,15 +357,13 @@
                     </div>
                     
                     <div>
-                        <form th:action="@{/vote-binh-luan}" method="post" th:if="${userLogged != null}">
-                            <input type="hidden" name="maBaiHat" th:value="${baiHat.maBaiHat}" />
-                            <input type="hidden" name="maBinhLuan" th:value="${bl.maBinhLuan}" />
-                            <button type="submit" class="btn-like-comment">
-                                👍 <span th:text="${banDoVoteBinhLuan.get(bl.maBinhLuan)}">0</span>
+                        <div th:if="${userLogged != null}">
+                            <button type="button" class="btn-like-comment ajax-like-btn" th:data-id="${bl.maBinhLuan}">
+                                👍 <span class="like-count" th:text="${banDoVoteBinhLuan.get(bl.maBinhLuan)}">0</span>
                             </button>
-                        </form>
+                        </div>
                         <div th:unless="${userLogged != null}">
-                            <button class="btn-like-comment" style="cursor: not-allowed; opacity: 0.5;" title="Bạn cần đăng nhập">
+                            <button class="btn-like-comment" style="cursor: not-allowed; opacity: 0.4;" title="Bạn cần đăng nhập">
                                 👍 <span th:text="${banDoVoteBinhLuan.get(bl.maBinhLuan)}">0</span>
                             </button>
                         </div>
@@ -135,22 +372,124 @@
             </div>
         </div>
 
-        <a href="/" class="btn-back">⬅ Quay lại danh sách</a>
+        <a href="/" class="btn-back">⬅ Quay lại trang chủ</a>
     </div>
     
-    <div class="player-container" th:unless="${baiHat != null}">
-        <h1 style="color: #ff4444;">Lỗi: Không tìm thấy bài hát này trên Muse Zone!</h1>
+    <div class="player-container" th:unless="${baiHat != null}" style="border-color: rgba(239, 68, 68, 0.2);">
+        <h1 style="color: #ef4444; font-family: 'Syne', sans-serif; font-size: 26px;">⚠️ Không tìm thấy tác phẩm này trên Muse Zone!</h1>
         <a href="/" class="btn-back">Quay lại trang chủ</a>
     </div>
-	<script>
-        // Kiểm tra xem trên thanh địa chỉ URL có chứa tham số báo lỗi vote không
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('errorVote') === 'true') {
-            alert('⚠️ Bạn đã thích bình luận này rồi! Không thể bình chọn nhiều lần.');
-            
-            // Xóa tham số error trên URL đi để giao diện nhìn sạch đẹp, không bị lặp lại alert khi f5
-            window.history.replaceState({}, document.title, window.location.pathname);
+
+    <script>
+        // 1. CHỨC NĂNG AJAX GỬI BÌNH LUẬN MỚI
+        const commentForm = document.getElementById('ajaxCommentForm');
+        if (commentForm) {
+            commentForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Ngăn hành động tải lại trang mặc định của form
+
+                const songId = document.getElementById('commentSongId').value;
+                const inputTextArea = document.getElementById('commentContentText');
+                const contentValue = inputTextArea.value.trim();
+
+                if (!contentValue) return;
+
+                // Tạo FormData gửi lên Server WebController
+                const formData = new FormData();
+                formData.append('maBaiHat', songId);
+                formData.append('noiDung', contentValue);
+
+                fetch('/gui-binh-luan', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) return response.json();
+                    throw new Error('Gửi bình luận không thành công.');
+                })
+                .then(data => {
+                    if (data.success) {
+                        const container = document.getElementById('commentsListContainer');
+                        
+                        // Xóa dòng chữ "Chưa có bình luận nào" nếu đây là bình luận đầu tiên
+                        const noCommentText = document.getElementById('noCommentText');
+                        if (noCommentText) noCommentText.remove();
+
+                        // Lấy thời gian hiện tại để hiển thị đồng bộ dạng dd/MM/yyyy HH:mm
+                        const now = new Date();
+                        const timeString = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+                        // Tạo cấu trúc HTML bình luận mới khớp 100% với cấu trúc css thời thượng ban đầu
+                        const newCommentHtml = `
+                            <div class="comment-item">
+                                <div>
+                                    <div class="comment-author">
+                                        <span>${data.hoTen}</span>
+                                        <span class="comment-time">${timeString}</span>
+                                    </div>
+                                    <div class="comment-text">${data.noiDung}</div>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn-like-comment ajax-like-btn" data-id="${data.maBinhLuan}">
+                                        👍 <span class="like-count">0</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+
+                        // Chèn bình luận mới mượt mà vào đầu danh sách bình luận (Chạy từ trên xuống dưới)
+                        container.insertAdjacentHTML('afterbegin', newCommentHtml);
+                        
+                        // Xóa sạch nội dung ô gõ để viết bình luận tiếp theo
+                        inputTextArea.value = '';
+                    }
+                })
+                .catch(error => {
+                    alert('⚠️ Đã xảy ra lỗi: ' + error.message);
+                });
+            });
         }
+
+        // 2. CHỨC NĂNG AJAX BẤM THÍCH (LIKE) BÌNH LUẬN KHÔNG LOAD TRANG
+        document.addEventListener('click', function(e) {
+            // Tìm phần tử có class .ajax-like-btn gần nhất với vị trí click chuột
+            const likeBtn = e.target.closest('.ajax-like-btn');
+            if (likeBtn) {
+                e.preventDefault();
+                
+                const maBinhLuan = likeBtn.getAttribute('data-id');
+                const countSpan = likeBtn.querySelector('.like-count');
+
+                const formData = new FormData();
+                formData.append('maBinhLuan', maBinhLuan);
+
+                fetch('/vote-binh-luan', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (response.ok) return response.json();
+                    if (response.status === 400) {
+                        alert('⚠️ Bạn đã thích bình luận này rồi! Không thể bình chọn nhiều lần.');
+                        throw new Error('Already liked');
+                    }
+                    throw new Error('Lỗi kết nối máy chủ');
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Cập nhật số lượng đếm lượt Thích hiển thị ngay trên màn hình nền mượt mà
+                        countSpan.textContent = data.newLikeCount;
+                        
+                        // Hiệu ứng đổi màu Neon bừng sáng nhẹ cho nút biểu thị đã tương tác thành công
+                        likeBtn.style.color = 'var(--primary)';
+                        likeBtn.style.borderColor = 'rgba(29, 185, 84, 0.5)';
+                        likeBtn.style.background = 'rgba(29, 185, 84, 0.12)';
+                    }
+                })
+                .catch(error => {
+                    console.log('Hủy xử lý hoặc lỗi hệ thống:', error.message);
+                });
+            }
+        });
     </script>
 </body>
 </html>

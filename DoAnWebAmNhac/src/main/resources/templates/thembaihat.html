@@ -2,66 +2,180 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Thêm Bài Hát Mới</title>
+    <title>Thêm Bài Hát Mới - Muse Zone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-main: #060609;
+            --bg-card: rgba(22, 22, 34, 0.6);
+            --bg-card-hover: rgba(30, 30, 47, 0.85);
+            --primary: #1DB954;
+            --primary-glow: rgba(29, 185, 84, 0.4);
+            --accent: #6366f1;
+            --text-active: #ffffff;
+            --text-muted: #64748b;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
         body {
-            background-color: #1a1a1a;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 50px;
+            background-color: var(--bg-main);
+            color: var(--text-active);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            /* Nền đèn Neon mờ huyền ảo ẩn phía sau đồng bộ hệ thống */
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(29, 185, 84, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(99, 102, 241, 0.06) 0%, transparent 45%);
+            background-attachment: fixed;
         }
-        h2 { color: #00cc66; }
+
+        /* --- HỘP FORM KÍNH MỜ STUDIO --- */
         .form-container {
-            background-color: #262626;
-            width: 400px;
-            margin: 0 auto;
-            padding: 30px;
-            border-radius: 10px;
-            border: 1px solid #00cc66;
-            text-align: left;
+            background-color: var(--bg-card);
+            width: 480px;
+            padding: 40px;
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 50px rgba(29, 185, 84, 0.02);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        label { color: #00cc66; font-weight: bold; }
+        .form-container:hover {
+            background-color: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.6), 0 0 40px rgba(99, 102, 241, 0.05);
+        }
+
+        h2 { 
+            text-align: center; 
+            font-family: 'Syne', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0 0 8px 0; 
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #ffffff 0%, #1DB954 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-sub {
+            color: var(--text-muted);
+            font-size: 13.5px;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        
+        label { 
+            display: block; 
+            font-size: 13px; 
+            font-weight: 600;
+            margin-bottom: 8px; 
+            color: var(--text-muted); 
+            letter-spacing: 0.3px;
+        }
+
+        /* Khung nhập liệu Input cao cấp */
         input {
-            width: 90%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            border: none;
-        }
-        button {
-            background-color: #00cc66;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
             width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background-color: rgba(0, 0, 0, 0.25);
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        button:hover { background-color: #00994c; }
+        input:focus {
+            border-color: var(--primary);
+            background-color: rgba(0, 0, 0, 0.45);
+            outline: none;
+            box-shadow: 0 0 20px rgba(29, 185, 84, 0.18);
+        }
+        input::placeholder {
+            color: #475569;
+        }
+
+        /* Nút Lưu bài hát mượt mà (Xanh -> Trắng sáng) */
+        button {
+            background-color: var(--primary);
+            color: white;
+            font-family: inherit;
+            font-weight: 700;
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: var(--text-active);
+            color: var(--bg-main);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Nút Hủy phong cách tối giản nhã nhặn */
+        .btn-cancel {
+            display: block;
+            text-align: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: color 0.2s;
+        }
+        .btn-cancel:hover {
+            color: var(--text-active);
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
-    <h2>Thêm Bài Hát Mới</h2>
-    
     <div class="form-container">
+        <h2>✨ Thêm Bài Hát Mới</h2>
+        <p class="form-sub">Chia sẻ những giai điệu tuyệt vời đến cộng đồng Muse Zone</p>
+        
         <form th:action="@{/them-bai-hat}" th:object="${baiHatMoi}" method="post">
             
-            <label>Tên bài hát:</label><br>
-            <input type="text" th:field="*{tenBaiHat}" placeholder="VD: Muộn Rồi Mà Sao Còn" required />
+            <div class="form-group">
+                <label>Tên bài hát</label>
+                <input type="text" th:field="*{tenBaiHat}" placeholder="VD: Muộn Rồi Mà Sao Còn..." required />
+            </div>
             
-            <label>Ca sĩ trình bày:</label><br>
-            <input type="text" th:field="*{nguoiTrinhBay}" placeholder="VD: Sơn Tùng M-TP" required />
+            <div class="form-group">
+                <label>Ca sĩ / Người trình bày</label>
+                <input type="text" th:field="*{nguoiTrinhBay}" placeholder="VD: Sơn Tùng M-TP..." required />
+            </div>
             
-            <label>Mã ID hoặc Link Youtube:</label><br>
-            <input type="text" th:field="*{linkYoutube}" placeholder="VD: x3bfa3cBwpo" required />
+            <div class="form-group">
+                <label>Mã Video YouTube hoặc Đường dẫn</label>
+                <input type="text" th:field="*{linkYoutube}" placeholder="VD: URL hoặc chuỗi kí tự ID video..." required />
+            </div>
             
-            <button type="submit">Lưu Vào Database</button>
+            <button type="submit">Phát Hành Tác Phẩm</button>
         </form>
+        
+        <a href="/" class="btn-cancel">Quay về trang chủ</a>
     </div>
 
 </body>

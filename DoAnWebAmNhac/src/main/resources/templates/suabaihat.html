@@ -3,50 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <title>Chỉnh Sửa Bài Hát - Muse Zone</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #121212; color: white; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 0; }
-        .form-container { max-width: 550px; margin: 50px auto; background: #181818; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border: 1px solid #282828; }
-        h2 { color: #1DB954; margin-top: 0; text-align: center; letter-spacing: 1px; }
-        .form-group { margin-bottom: 18px; }
-        label { display: block; margin-bottom: 6px; font-size: 14px; color: #b3b3b3; }
-        .form-control { width: 100%; background: #282828; border: 1px solid #444; border-radius: 6px; color: white; padding: 10px 12px; font-size: 14px; box-sizing: border-box; }
-        .form-control:focus { outline: none; border-color: #1DB954; }
-        .btn-submit { width: 100%; background: #1DB954; color: white; border: none; padding: 12px; border-radius: 25px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 10px; transition: 0.2s; }
-        .btn-submit:hover { background: #1ed760; transform: scale(1.01); }
-        .btn-cancel { display: block; text-align: center; color: #b3b3b3; text-decoration: none; font-size: 13px; margin-top: 15px; }
-        .btn-cancel:hover { color: white; text-decoration: underline; }
+        :root {
+            --bg-main: #060609;
+            --bg-card: rgba(22, 22, 34, 0.6);
+            --bg-card-hover: rgba(30, 30, 47, 0.85);
+            --primary: #1DB954;
+            --primary-glow: rgba(29, 185, 84, 0.4);
+            --accent: #6366f1;
+            --text-active: #ffffff;
+            --text-muted: #64748b;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-active);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            /* Đồng bộ nền đèn Neon mờ huyền ảo ẩn phía sau hệ thống */
+            background-image: 
+                radial-gradient(circle at 25% 25%, rgba(29, 185, 84, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 75% 75%, rgba(99, 102, 241, 0.06) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        /* --- HỘP FORM KÍNH MỜ CHỈNH SỬA STUDIO --- */
+        .form-container {
+            background-color: var(--bg-card);
+            width: 500px;
+            padding: 40px;
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 50px rgba(29, 185, 84, 0.02);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .form-container:hover {
+            background-color: var(--bg-card-hover);
+            border-color: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.55), 0 0 40px rgba(99, 102, 241, 0.05);
+        }
+
+        h2 { 
+            text-align: center; 
+            font-family: 'Syne', sans-serif;
+            font-size: 25px;
+            font-weight: 700;
+            margin: 0 0 8px 0; 
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #ffffff 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-sub {
+            color: var(--text-muted);
+            font-size: 13.5px;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        
+        label { 
+            display: block; 
+            font-size: 13px; 
+            font-weight: 600;
+            margin-bottom: 8px; 
+            color: var(--text-muted); 
+            letter-spacing: 0.3px;
+        }
+
+        /* Khung nhập liệu tinh chỉnh */
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background-color: rgba(0, 0, 0, 0.25);
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .form-control:focus {
+            border-color: var(--accent);
+            background-color: rgba(0, 0, 0, 0.45);
+            outline: none;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.18);
+        }
+        .form-control::placeholder {
+            color: #475569;
+        }
+
+        /* Nút Lưu cập nhật (Xanh -> Trắng hoàng gia) */
+        .btn-submit {
+            background-color: var(--primary);
+            color: white;
+            font-family: inherit;
+            font-weight: 700;
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 15px var(--primary-glow);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background-color: var(--text-active);
+            color: var(--bg-main);
+            box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Nút Hủy điều hướng */
+        .btn-cancel {
+            display: block;
+            text-align: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: color 0.2s;
+        }
+        .btn-cancel:hover {
+            color: var(--text-active);
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
 
     <div class="form-container">
-        <h2>✏️ CHỈNH SỬA BÀI HÁT</h2>
-        <p style="color: #727272; font-size: 13px; text-align: center; margin-top: -5px; margin-bottom: 25px;">Thay đổi thông tin bài hát hệ thống một cách chính xác</p>
+        <h2>✏️ Chỉnh Sửa Bài Hát</h2>
+        <p class="form-sub">Cập nhật chính xác thông tin tác phẩm trên hệ thống</p>
         
         <form th:action="@{/sua-bai-hat}" th:object="${baiHatCanSua}" method="post">
             
             <input type="hidden" th:field="*{maBaiHat}" />
-            
             <input type="hidden" th:field="*{trangThaiDuyet}" />
 
             <div class="form-group">
-                <label>Tên bài hát:</label>
-                <input type="text" th:field="*{tenBaiHat}" class="form-control" required placeholder="Nhập tên bài hát..." />
+                <label>Tên bài hát</label>
+                <input type="text" th:field="*{tenBaiHat}" class="form-control" required placeholder="Nhập tên bài hát mới..." />
             </div>
 
             <div class="form-group">
-                <label>Ca sĩ / Người trình bày:</label>
-                <input type="text" th:field="*{nguoiTrinhBay}" class="form-control" required placeholder="Nhập tên ca sĩ..." />
+                <label>Ca sĩ / Người trình bày</label>
+                <input type="text" th:field="*{nguoiTrinhBay}" class="form-control" required placeholder="Nhập nghệ sĩ thể hiện..." />
             </div>
 
             <div class="form-group">
-                <label>Đường dẫn YouTube (Link gốc hoặc Mã Video ID):</label>
-                <input type="text" th:field="*{linkYoutube}" class="form-control" required placeholder="https://www.youtube.com/watch?v=..." />
+                <label>Đường dẫn YouTube (Link gốc hoặc Mã Video ID)</label>
+                <input type="text" th:field="*{linkYoutube}" class="form-control" required placeholder="Nhập mã video ID mới..." />
             </div>
 
-            <button type="submit" class="btn-submit">Cập nhật thông tin</button>
-            <a href="/admin" class="btn-cancel">Hủy bỏ & Quay lại</a>
+            <button type="submit" class="btn-submit">Cập Nhật Thông Tin</button>
         </form>
+        
+        <a th:href="@{/admin}" class="btn-cancel">Hủy bỏ và quay lại</a>
     </div>
 
 </body>
