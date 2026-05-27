@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,7 @@ import clc65.nguyentandat.DoAnWebAmNhac.Entity.BaiHat;
 import clc65.nguyentandat.DoAnWebAmNhac.Entity.NguoiDung;
 import clc65.nguyentandat.DoAnWebAmNhac.Entity.BinhLuan;
 import clc65.nguyentandat.DoAnWebAmNhac.Entity.BinhLuanVote;
+import clc65.nguyentandat.DoAnWebAmNhac.Entity.TagVote;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -105,15 +108,31 @@ public class WebController {
             m.addAttribute("baiHat", bh);
             m.addAttribute("linkEmbed", urlNhung);
 
-            // --- XỬ LÝ LOGIC ĐẾM VOTE THỂ LOẠI ---
+            // Lấy thông tin người dùng đang đăng nhập hiện tại
+            NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
+            m.addAttribute("userLogged", userLogged);
+
+            // --- XỬ LÝ LOGIC ĐẾM VOTE THỂ LOẠI & TRẠNG THÁI ACTIVE ---
             List<clc65.nguyentandat.DoAnWebAmNhac.Entity.Tag> dsTag = tagRepository.findAll();
             Map<Integer, Integer> banDoLuotVote = new HashMap<>();
+            Set<Integer> tapHopTagDaVote = new HashSet<>(); // Lưu các mã tag mà user này đã vote cho bài hát này
+            
             for (clc65.nguyentandat.DoAnWebAmNhac.Entity.Tag tag : dsTag) {
+                // Tính tổng số lượt vote của từng tag cho bài hát hiện tại
                 int soVote = tagVoteRepository.countByMaBaiHatAndMaTag(id, tag.getMaTag());
                 banDoLuotVote.put(tag.getMaTag(), soVote);
+                
+                // Nếu người dùng đã đăng nhập, kiểm tra xem họ đã vote tag này chưa để hiển thị màu sáng lập tức
+                if (userLogged != null) {
+                    TagVote voteTonTai = tagVoteRepository.findByMaBaiHatAndMaTagAndMaNguoiDung(id, tag.getMaTag(), userLogged.getMaNguoiDung());
+                    if (voteTonTai != null) {
+                        tapHopTagDaVote.add(tag.getMaTag());
+                    }
+                }
             }
             m.addAttribute("listTag", dsTag);
             m.addAttribute("banDoLuotVote", banDoLuotVote); 
+            m.addAttribute("tapHopTagDaVote", tapHopTagDaVote);
 
             // --- XỬ LÝ HỆ THỐNG BÌNH LUẬN & UPVOTE ---
             List<BinhLuan> dsBinhLuan = binhLuanRepository.findByMaBaiHatOrderByNgayBinhLuanDesc(id);
@@ -136,9 +155,6 @@ public class WebController {
             m.addAttribute("banDoVoteBinhLuan", banDoVoteBinhLuan);
             m.addAttribute("tenNguoiBinhLuan", tenNguoiBinhLuan);
 
-            NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
-            m.addAttribute("userLogged", userLogged);
-
         } else {
             return "redirect:/";
         }
@@ -146,18 +162,14 @@ public class WebController {
     }
     
     // ==========================================
-    // 3. QUẢN LÝ BÀI HÁT (FULL CRUD - PHÂN QUYỀN AN TOÀN)
+    // 3. QUẢN LÝ BÀI HÁT (FULL CRUD)
     // ==========================================
-    
-    // --- CHỨC NĂNG: THÊM BÀI HÁT (BẢO MẬT: CHỈ NGHỆ SĨ CHỈ SỐ 1 VÀ ADMIN CHỈ SỐ 2) ---
     @GetMapping("/them-bai-hat")
     public String showFormThem(ModelMap m, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
-        
         if (userLogged == null || userLogged.getPhanQuyen() == 0) {
             return "redirect:/dang-nhap";
         }
-        
         m.addAttribute("baiHatMoi", new BaiHat());
         return "thembaihat"; 
     }
@@ -165,30 +177,24 @@ public class WebController {
     @PostMapping("/them-bai-hat")
     public String saveBaiHat(@ModelAttribute("baiHatMoi") BaiHat baiHat, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
-        
         if (userLogged == null || userLogged.getPhanQuyen() == 0) {
             return "redirect:/dang-nhap";
         }
-        
         baiHat.setTrangThaiDuyet(1); 
         baiHatRepository.save(baiHat);
         return "redirect:/"; 
     }
 
-    // --- CHỨC NĂNG: SỬA BÀI HÁT (BẢO MẬT: CHỈ ADMIN QUYỀN SỐ 2) ---
     @GetMapping("/sua-bai-hat/{id}")
     public String showFormSua(@PathVariable("id") Integer id, ModelMap m, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
-        
         if (userLogged == null || userLogged.getPhanQuyen() != 2) {
             return "redirect:/";
         }
-        
         BaiHat bh = baiHatRepository.findById(id).orElse(null);
         if (bh == null) {
             return "redirect:/admin";
         }
-        
         m.addAttribute("baiHatCanSua", bh);
         return "suabaihat"; 
     }
@@ -196,39 +202,31 @@ public class WebController {
     @PostMapping("/sua-bai-hat")
     public String thucHienCapNhat(@ModelAttribute("baiHatCanSua") BaiHat baiHat, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
-        
         if (userLogged == null || userLogged.getPhanQuyen() != 2) {
             return "redirect:/";
         }
-        
         baiHat.setTrangThaiDuyet(1);
         baiHatRepository.save(baiHat);
         return "redirect:/admin";
     }
 
-    // --- CHỨC NĂNG: XEM TRANG QUẢN TRỊ ADMIN (BẢO MẬT: CHỈ ADMIN QUYỀN SỐ 2) ---
     @GetMapping("/admin")
     public String showAdminPage(ModelMap m, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
-        
         if (userLogged == null || userLogged.getPhanQuyen() != 2) {
             return "redirect:/";
         }
-        
         List<BaiHat> dsToanBo = baiHatRepository.findAll();
         m.addAttribute("listAdmin", dsToanBo);
         return "admin"; 
     }
 
-    // --- CHỨC NĂNG: XÓA BÀI HÁT (BẢO MẬT: CHỈ ADMIN QUYỀN SỐ 2) ---
     @GetMapping("/delete/{id}")
     public String deleteBaiHat(@PathVariable("id") Integer id, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
-        
         if (userLogged == null || userLogged.getPhanQuyen() != 2) {
             return "redirect:/";
         }
-        
         baiHatRepository.deleteById(id);
         return "redirect:/admin";
     }
@@ -294,33 +292,57 @@ public class WebController {
     }
     
     // ==========================================
-    // 6. XỬ LÝ BÌNH CHỌN (VOTE) THỂ LOẠI
+    // ✨ 6. XỬ LÝ BÌNH CHỌN (VOTE) THỂ LOẠI QUA AJAX (CẬP NHẬT: TOGGLE VOTE / UNVOTE)
     // ==========================================
     @PostMapping("/vote-the-loai")
-    public String xuLyVote(@RequestParam("maBaiHat") Integer maBaiHat, 
-                           @RequestParam("maTag") Integer maTag,
-                           HttpSession session) {
+    @ResponseBody
+    public ResponseEntity<?> xuLyVote(@RequestParam("maBaiHat") Integer maBaiHat, 
+                                      @RequestParam("maTag") Integer maTag,
+                                      HttpSession session) {
         
+        Map<String, Object> response = new HashMap<>();
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
+        
         if (userLogged == null) {
-            return "redirect:/dang-nhap";
+            return ResponseEntity.status(401).body("Bạn chưa đăng nhập!");
         }
 
-        clc65.nguyentandat.DoAnWebAmNhac.Entity.TagVote voteMoi = new clc65.nguyentandat.DoAnWebAmNhac.Entity.TagVote();
-        voteMoi.setMaBaiHat(maBaiHat);
-        voteMoi.setMaTag(maTag);
-        voteMoi.setMaNguoiDung(userLogged.getMaNguoiDung()); 
-        voteMoi.setNgayVote(LocalDateTime.now());
+        // Bước 1: Kiểm tra xem người dùng hiện tại đã bình chọn cho tag này tại bài hát này chưa
+        TagVote voteDaTonTai = tagVoteRepository.findByMaBaiHatAndMaTagAndMaNguoiDung(maBaiHat, maTag, userLogged.getMaNguoiDung());
+        
+        boolean currentVotedStatus;
+        
+        if (voteDaTonTai != null) {
+            // 👉 NẾU ĐÃ VOTE -> Người dùng nhấn lần 2 -> Tiến hành HỦY VOTE (Xóa khỏi CSDL)
+            tagVoteRepository.delete(voteDaTonTai);
+            currentVotedStatus = false; // Trạng thái hiện tại: Đã bỏ chọn
+        } else {
+            // 👉 NẾU CHƯA VOTE -> Người dùng nhấn lần 1 -> Tiến hành THÊM MỚI lượt vote vào CSDL
+            TagVote voteMoi = new TagVote();
+            voteMoi.setMaBaiHat(maBaiHat);
+            voteMoi.setMaTag(maTag);
+            voteMoi.setMaNguoiDung(userLogged.getMaNguoiDung()); 
+            voteMoi.setNgayVote(LocalDateTime.now());
+            tagVoteRepository.save(voteMoi); 
+            currentVotedStatus = true; // Trạng thái hiện tại: Đã chọn
+        }
 
-        tagVoteRepository.save(voteMoi); 
-        return "redirect:/play/" + maBaiHat;
+        // Bước 2: Đếm lại tổng số lượt bình chọn mới nhất của Tag này đối với bài hát
+        int tongSoVoteMoi = tagVoteRepository.countByMaBaiHatAndMaTag(maBaiHat, maTag);
+
+        // Bước 3: Gửi dữ liệu JSON phản hồi chính xác về cho JavaScript xử lý giao diện
+        response.put("success", true);
+        response.put("voted", currentVotedStatus); // Trả về true (Vừa kích hoạt) hoặc false (Vừa hủy)
+        response.put("newVoteCount", tongSoVoteMoi); // Con số tổng số lượt vote mới nhất
+        
+        return ResponseEntity.ok(response);
     }
 
     // ==========================================
-    // ✨ 7. XỬ LÝ THÊM BÌNH LUẬN MỚI QUA AJAX (ĐÃ NÂNG CẤP)
+    // 7. XỬ LÝ THÊM BÌNH LUẬN MỚI QUA AJAX
     // ==========================================
     @PostMapping("/gui-binh-luan")
-    @ResponseBody // 👈 Trả dữ liệu thuần JSON ngầm, ngăn chặn reload trang
+    @ResponseBody 
     public ResponseEntity<?> guiBinhLuan(@RequestParam("maBaiHat") Integer maBaiHat,
                                          @RequestParam("noiDung") String noiDung,
                                          HttpSession session) {
@@ -333,7 +355,6 @@ public class WebController {
             return ResponseEntity.status(401).body("Bạn chưa đăng nhập!");
         }
 
-        // Tạo mới và lưu thực thể Bình Luận
         BinhLuan bl = new BinhLuan();
         bl.setMaBaiHat(maBaiHat);
         bl.setMaNguoiDung(userLogged.getMaNguoiDung()); 
@@ -341,10 +362,9 @@ public class WebController {
         bl.setNgayBinhLuan(LocalDateTime.now());
         BinhLuan savedBl = binhLuanRepository.save(bl);
 
-        // Đóng gói dữ liệu trả về cho JavaScript phía Giao diện tự render
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
-        response.put("maBinhLuan", savedBl.getMaBinhLuan()); // Gửi mã bình luận mới để có thể Like ngay
+        response.put("maBinhLuan", savedBl.getMaBinhLuan()); 
         response.put("hoTen", userLogged.getHoTen());
         response.put("noiDung", savedBl.getNoiDung());
         
@@ -352,10 +372,10 @@ public class WebController {
     }
 
     // ==========================================
-    // ✨ 8. XỬ LÝ THÍCH BÌNH LUẬN QUA AJAX (ĐÃ NÂNG CẤP)
+    // 8. XỬ LÝ THÍCH BÌNH LUẬN QUA AJAX (TOGGLE LIKE / UNLIKE)
     // ==========================================
     @PostMapping("/vote-binh-luan")
-    @ResponseBody // 👈 Trả dữ liệu thuần JSON ngầm, ngăn chặn reload trang
+    @ResponseBody 
     public ResponseEntity<?> voteBinhLuan(@RequestParam("maBinhLuan") Integer maBinhLuan,
                                           HttpSession session) {
         
@@ -364,30 +384,102 @@ public class WebController {
             return ResponseEntity.status(401).body("Bạn chưa đăng nhập!");
         }
 
-        // Kiểm tra xem user này đã thích bình luận này trong DB chưa
         BinhLuanVote voteDaTonTai = binhLuanVoteRepository.findByMaBinhLuanAndMaNguoiDung(maBinhLuan, userLogged.getMaNguoiDung());
+        boolean loggedLikedStatus;
         
         if (voteDaTonTai != null) {
-            // Trả lỗi 400 nếu trùng lặp để JavaScript bắt và hiển thị Alert cảnh báo
-            return ResponseEntity.badRequest().body("Bạn đã thích bình luận này rồi!");
+            binhLuanVoteRepository.delete(voteDaTonTai);
+            loggedLikedStatus = false; 
+        } else {
+            BinhLuanVote blVote = new BinhLuanVote();
+            blVote.setMaBinhLuan(maBinhLuan);
+            blVote.setMaNguoiDung(userLogged.getMaNguoiDung()); 
+            blVote.setIsUpvote(1); 
+            blVote.setNgayVote(LocalDateTime.now());
+            binhLuanVoteRepository.save(blVote);
+            loggedLikedStatus = true; 
         }
 
-        // Nếu hợp lệ, lưu vào database
-        BinhLuanVote blVote = new BinhLuanVote();
-        blVote.setMaBinhLuan(maBinhLuan);
-        blVote.setMaNguoiDung(userLogged.getMaNguoiDung()); 
-        blVote.setIsUpvote(1); 
-        blVote.setNgayVote(LocalDateTime.now());
-        binhLuanVoteRepository.save(blVote);
-
-        // Tính toán lại tổng lượt vote mới nhất sau khi cộng thành công
         int soUpvoteMoi = binhLuanVoteRepository.countByMaBinhLuanAndIsUpvote(maBinhLuan, 1);
 
-        // Trả kết quả số lượng mới về cho Client
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
-        response.put("newLikeCount", soUpvoteMoi);
+        response.put("liked", loggedLikedStatus); 
+        response.put("newLikeCount", soUpvoteMoi); 
         
         return ResponseEntity.ok(response);
+    }
+    // ==========================================
+    // ✨ 9. XỬ LÝ SỬA BÌNH LUẬN QUA AJAX (CHỈ CHÍNH CHỦ)
+    // ==========================================
+    @PostMapping("/sua-binh-luan")
+    @ResponseBody
+    public ResponseEntity<?> suaBinhLuan(@RequestParam("maBinhLuan") Integer maBinhLuan,
+                                         @RequestParam("noiDung") String noiDung,
+                                         HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
+        
+        if (userLogged == null) {
+            return ResponseEntity.status(401).body("Bạn chưa đăng nhập!");
+        }
+        if (noiDung == null || noiDung.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body("Nội dung không được để trống!");
+        }
+
+        BinhLuan bl = binhLuanRepository.findById(maBinhLuan).orElse(null);
+        if (bl == null) {
+            return ResponseEntity.status(404).body("Không tìm thấy bình luận cần sửa!");
+        }
+
+        // KIỂM TRA QUYỀN: Chỉ có người viết ra bình luận đó mới được quyền sửa
+        if (!bl.getMaNguoiDung().equals(userLogged.getMaNguoiDung())) {
+            return ResponseEntity.status(403).body("Bạn không có quyền sửa bình luận này!");
+        }
+
+        bl.setNoiDung(noiDung.trim());
+        binhLuanRepository.save(bl);
+
+        response.put("success", true);
+        response.put("noiDungMoi", bl.getNoiDung());
+        return ResponseEntity.ok(response);
+    }
+
+    // ==========================================
+    // ✨ 10. XỬ LÝ XÓA BÌNH LUẬN QUA AJAX (CHÍNH CHỦ HOẶC ADMIN)
+    // ==========================================
+    @PostMapping("/xoa-binh-luan")
+    @ResponseBody
+    public ResponseEntity<?> xoaBinhLuan(@RequestParam("maBinhLuan") Integer maBinhLuan,
+                                         HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
+        
+        if (userLogged == null) {
+            return ResponseEntity.status(401).body("Bạn chưa đăng nhập!");
+        }
+
+        BinhLuan bl = binhLuanRepository.findById(maBinhLuan).orElse(null);
+        if (bl == null) {
+            return ResponseEntity.status(404).body("Không tìm thấy bình luận!");
+        }
+
+        // KIỂM TRA QUYỀN: Phải là Người viết bình luận HOẶC là Admin (phanQuyen == 2)
+        if (!bl.getMaNguoiDung().equals(userLogged.getMaNguoiDung()) && userLogged.getPhanQuyen() != 2) {
+            return ResponseEntity.status(403).body("Bạn không có quyền xóa bình luận này!");
+        }
+
+        try {
+            // 1. Xóa sạch các dữ liệu liên quan ở bảng liên kết (BinhLuanVote) tránh lỗi Foreign Key
+            binhLuanVoteRepository.deleteByMaBinhLuan(maBinhLuan);
+            
+            // 2. Tiến hành xóa bình luận chính thức
+            binhLuanRepository.delete(bl);
+            
+            response.put("success", true);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Lỗi hệ thống khi xóa bình luận: " + e.getMessage());
+        }
     }
 }

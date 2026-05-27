@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import clc65.nguyentandat.DoAnWebAmNhac.Entity.BinhLuanVote;
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface BinhLuanVoteRepository extends JpaRepository<BinhLuanVote, Integer> {
@@ -12,4 +13,7 @@ public interface BinhLuanVoteRepository extends JpaRepository<BinhLuanVote, Inte
     int countByMaBinhLuanAndIsUpvote(Integer maBinhLuan, Integer isUpvote);
     
     BinhLuanVote findByMaBinhLuanAndMaNguoiDung(Integer maBinhLuan, Integer maNguoiDung);
+    
+    @Transactional
+    void deleteByMaBinhLuan(Integer maBinhLuan);
 }

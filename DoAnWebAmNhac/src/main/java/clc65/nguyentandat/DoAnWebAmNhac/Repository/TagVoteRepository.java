@@ -12,4 +12,6 @@ public interface TagVoteRepository extends JpaRepository<TagVote, Integer>{
     
     // Hàm kiểm tra nâng cao: Xem người dùng này đã từng vote cho bài hát này chưa (tránh spam vote)
     TagVote findByMaBaiHatAndMaNguoiDung(Integer maBaiHat, Integer maNguoiDung);
+    
+    TagVote findByMaBaiHatAndMaTagAndMaNguoiDung(Integer maBaiHat, Integer maTag, Integer maNguoiDung);
 }
