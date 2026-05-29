@@ -6,15 +6,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-main: #0a0a0f;
-            --bg-card: rgba(24, 24, 37, 0.75);
-            --bg-card-hover: rgba(32, 32, 50, 0.9);
+            --bg-main: #060609;
+            --bg-card: rgba(15, 15, 27, 0.65);
+            --bg-card-hover: rgba(22, 22, 38, 0.8);
             --primary: #1DB954;
-            --primary-glow: rgba(29, 185, 84, 0.25);
+            --primary-glow: rgba(29, 185, 84, 0.35);
             --text-active: #ffffff;
-            --text-muted: #94a3b8;
+            --text-muted: #64748b;
             --danger: #ef4444;
-            --danger-glow: rgba(239, 68, 68, 0.25);
+            --danger-glow: rgba(239, 68, 68, 0.3);
+            --indigo: #6366f1;
+            --indigo-glow: rgba(99, 102, 241, 0.3);
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -26,25 +28,44 @@
             margin: 0; 
             padding: 0; 
             min-height: 100vh;
-            /* Đèn nền Neon mờ ảo ẩn sâu phía sau dịu nhẹ */
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            z-index: -1;
             background-image: 
-                radial-gradient(circle at 15% 15%, rgba(29, 185, 84, 0.06) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(99, 102, 241, 0.04) 0%, transparent 45%);
-            background-attachment: fixed;
+                radial-gradient(circle at 20% 30%, rgba(29, 185, 84, 0.07) 0%, transparent 35%),
+                radial-gradient(circle at 80% 70%, rgba(99, 102, 241, 0.06) 0%, transparent 40%),
+                radial-gradient(circle at 50% 10%, rgba(236, 72, 153, 0.03) 0%, transparent 30%);
+            animation: gradientMove 25s ease infinite alternate;
+        }
+
+        @keyframes gradientMove {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            50% { transform: translate(-5%, -5%) rotate(5deg); }
+            100% { transform: translate(5%, 2%) rotate(-5deg); }
         }
 
         .admin-container { 
             max-width: 1200px; 
             margin: 60px auto; 
             padding: 0 24px; 
+            position: relative;
+            z-index: 1;
         }
 
-        /* --- THANH TIÊU ĐỀ ĐIỀU HƯỚNG ĐÃ SỬA LỖI --- */
         .header-area { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
             padding-bottom: 24px; 
             margin-bottom: 40px; 
         }
@@ -52,18 +73,19 @@
         .title-wrapper {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
         .title-icon {
-            font-size: 24px;
-            background: rgba(29, 185, 84, 0.15);
-            padding: 8px;
-            border-radius: 12px;
+            font-size: 22px;
+            background: linear-gradient(135deg, rgba(29, 185, 84, 0.2), rgba(99, 102, 241, 0.1));
+            padding: 10px;
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid rgba(29, 185, 84, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
         h1 { 
@@ -73,39 +95,41 @@
             letter-spacing: -0.5px;
             color: var(--text-active);
             text-transform: uppercase;
+            background: linear-gradient(135deg, #ffffff 60%, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        /* Nút quay về trang chủ phong cách tinh gọn viền mờ */
         .btn-home { 
-            background: rgba(255, 255, 255, 0.03); 
+            background: rgba(255, 255, 255, 0.02); 
             color: var(--text-active); 
             text-decoration: none; 
-            padding: 10px 22px; 
+            padding: 10px 24px; 
             border-radius: 30px; 
             font-size: 13.5px; 
             font-weight: 700; 
             border: 1px solid rgba(255, 255, 255, 0.08); 
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            backdrop-filter: blur(10px);
         }
         .btn-home:hover { 
-            background: rgba(255, 255, 255, 0.08); 
-            border-color: var(--primary);
-            box-shadow: 0 0 20px var(--primary-glow);
-            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.06); 
+            border-color: rgba(29, 185, 84, 0.6);
+            box-shadow: 0 0 25px var(--primary-glow);
+            transform: translateY(-2px);
         }
         
-        /* --- BẢNG QUẢN TRỊ KÍNH MỜ CAO CẤP MỚI --- */
         .table-responsive {
             background: var(--bg-card); 
-            border-radius: 20px; 
+            border-radius: 24px; 
             overflow: hidden; 
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.06); 
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5);
         }
 
         .admin-table { 
@@ -114,56 +138,56 @@
             text-align: left; 
         }
         
-        /* Tiêu đề các mục cột */
         .admin-table th { 
-            background: rgba(0, 0, 0, 0.4); 
-            color: var(--text-muted); 
-            font-size: 12px; 
+            background: rgba(4, 4, 6, 0.45); 
+            color: #94a3b8; 
+            font-size: 11.5px; 
             font-weight: 700;
             text-transform: uppercase; 
-            letter-spacing: 1px; 
-            padding: 20px; 
+            letter-spacing: 1.5px; 
+            padding: 22px 20px; 
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
         
-        /* Các dòng chứa thông tin dữ liệu */
         .admin-table td { 
-            padding: 18px 20px; 
+            padding: 20px; 
             border-bottom: 1px solid rgba(255, 255, 255, 0.03); 
             font-size: 14.5px; 
             color: #cbd5e1;
             vertical-align: middle;
         }
         
-        /* Hiệu ứng di chuột qua từng dòng bừng sáng dịu nhẹ */
         .admin-table tbody tr {
-            transition: background-color 0.2s ease;
+            transition: all 0.25s ease;
         }
         .admin-table tbody tr:hover { 
-            background-color: rgba(255, 255, 255, 0.02); 
+            background-color: rgba(255, 255, 255, 0.03); 
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.01);
         }
         .admin-table tbody tr:last-child td {
             border-bottom: none;
         }
         
-        /* Mã định dạng chuỗi liên kết */
         .video-link-style {
             font-family: monospace;
-            color: #64748b; 
-            max-width: 180px; 
+            color: #475569; 
+            max-width: 120px; 
             overflow: hidden; 
             text-overflow: ellipsis; 
             white-space: nowrap;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
         }
 
-        /* --- HỆ THỐNG NÚT HÀNH ĐỘNG CHUẨN SẠCH ĐẸP --- */
         .action-links { 
             display: flex; 
-            gap: 10px; 
+            gap: 8px; 
             justify-content: center;
+            align-items: center;
         }
         
-        /* Nút Sửa */
         .btn-edit { 
             background: var(--primary); 
             color: white; 
@@ -173,18 +197,36 @@
             font-size: 13px; 
             font-weight: 700; 
             box-shadow: 0 4px 12px var(--primary-glow);
-            transition: all 0.2s ease; 
+            transition: all 0.25s ease; 
         }
         .btn-edit:hover { 
             background: var(--text-active); 
             color: #000000; 
-            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.35);
-            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-tag {
+            background: rgba(99, 102, 241, 0.12);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.25);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .btn-tag:hover {
+            background: var(--indigo);
+            color: white;
+            box-shadow: 0 6px 18px var(--indigo-glow);
+            border-color: transparent;
+            transform: translateY(-2px);
         }
         
-        /* Nút Xóa */
         .btn-delete { 
-            background: rgba(239, 68, 68, 0.15); 
+            background: rgba(239, 68, 68, 0.08); 
             color: #fca5a5; 
             text-decoration: none; 
             padding: 8px 18px; 
@@ -192,14 +234,205 @@
             font-size: 13px; 
             font-weight: 700; 
             border: 1px solid rgba(239, 68, 68, 0.2);
-            transition: all 0.2s ease; 
+            transition: all 0.25s ease; 
         }
         .btn-delete:hover { 
             background: var(--danger); 
             color: white;
-            border-color: var(--danger);
+            border-color: transparent;
             box-shadow: 0 6px 18px var(--danger-glow);
+            transform: translateY(-2px);
+        }
+
+        .modal-mask {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(3, 3, 6, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content-box {
+            background: rgba(18, 18, 30, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            padding: 28px;
+            width: 90%;
+            max-width: 540px;
+            border-radius: 24px;
+            box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8);
+            animation: popUpAnim 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin: 0 auto;
+        }
+
+        @keyframes popUpAnim {
+            from { transform: scale(0.95) translateY(15px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .modal-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .modal-heading {
+            font-size: 17px;
+            font-weight: 800;
+            color: white;
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+
+        .close-x-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .close-x-btn:hover { color: white; background: rgba(255, 255, 255, 0.1); }
+
+        .create-tag-inline-form {
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .input-tag-text {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px 14px;
+            color: white;
+            font-family: inherit;
+            font-size: 13.5px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-tag-text:focus {
+            border-color: var(--indigo);
+            background: rgba(255, 255, 255, 0.07);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.15);
+        }
+
+        .btn-submit-new-tag {
+            background: linear-gradient(135deg, var(--indigo), #4f46e5);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0 18px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px var(--indigo-glow);
+        }
+
+        .btn-submit-new-tag:hover {
             transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .tag-row-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .tag-row-item:last-child { border-bottom: none; }
+
+        .tag-left-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 🌟 CSS CHO NÚT XÓA VĨNH VIỄN TAG */
+        .btn-system-delete-tag {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 4px;
+            border-radius: 6px;
+            opacity: 0.4;
+            transition: all 0.2s;
+        }
+        .btn-system-delete-tag:hover {
+            opacity: 1;
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .tag-name-label {
+            font-size: 14.5px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .tag-inner-badge {
+            background: rgba(255, 255, 255, 0.05);
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 8px;
+            margin-left: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .action-tag-mini-btn {
+            border: none;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .action-tag-mini-btn.add-mode {
+            background: rgba(29, 185, 84, 0.12);
+            color: var(--primary);
+            border: 1px solid rgba(29, 185, 84, 0.2);
+        }
+        .action-tag-mini-btn.add-mode:hover {
+            background: var(--primary);
+            color: black;
+        }
+        .action-tag-mini-btn.remove-mode {
+            background: rgba(239, 68, 68, 0.12);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+        .action-tag-mini-btn.remove-mode:hover {
+            background: var(--danger);
+            color: white;
         }
     </style>
 </head>
@@ -218,25 +451,25 @@
             <table class="admin-table">
                 <thead>
                     <tr>
-                        <th style="width: 8%;">ID</th>
-                        <th style="width: 34%;">Tên Bài Hát</th>
-                        <th style="width: 25%;">Ca Sĩ / Nghệ Sĩ</th>
-                        <th style="width: 15%;">Mã Video Youtube</th>
-                        <th style="width: 18%; text-align: center;">Hành Động Quản Lý</th>
+                        <th style="width: 6%;">ID</th>
+                        <th style="width: 28%;">Tên Bài Hát</th>
+                        <th style="width: 22%;">Ca Sĩ / Nghệ Sĩ</th>
+                        <th style="width: 14%;">Mã Video Youtube</th>
+                        <th style="width: 30%; text-align: center;">Hành Động Quản Lý</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="bh : ${listAdmin}">
                         <td style="color: #64748b; font-weight: 600;" th:text="${bh.maBaiHat}">ID</td>
-                        <td style="font-weight: 700; color: var(--text-active);" th:text="${bh.tenBaiHat}">Tên bài hát</td>
+                        <td style="font-weight: 700; color: var(--text-active);" th:text="${bh.tenBaiHat}" th:id="'song-title-' + ${bh.maBaiHat}">Tên bài hát</td>
                         <td style="font-weight: 500;" th:text="${bh.nguoiTrinhBay}">Ca sĩ</td>
                         <td>
                             <div class="video-link-style" th:text="${bh.linkYoutube}">Link</div>
                         </td>
                         <td>
                             <div class="action-links">
+                                <button type="button" class="btn-tag" th:onclick="openTagManagerModal([[${bh.maBaiHat}]])">🏷️ Thể Loại</button>
                                 <a th:href="@{/sua-bai-hat/{id}(id=${bh.maBaiHat})}" class="btn-edit">Sửa</a>
-                                
                                 <a th:href="@{/delete/{id}(id=${bh.maBaiHat})}" class="btn-delete" 
                                    onclick="return confirm('⚠️ Bạn có chắc chắn muốn xóa vĩnh viễn bài hát này không?')">Xóa</a>
                             </div>
@@ -247,5 +480,165 @@
         </div>
     </div>
 
+    <div id="tagManagerModal" class="modal-mask" onclick="handleOutsideModalClick(event)">
+        <div class="modal-content-box">
+            <div class="modal-top-bar">
+                <h3 class="modal-heading" id="modalSongNameDisplay">🏷️ Quản Lý Thể Loại</h3>
+                <button type="button" class="close-x-btn" onclick="closeTagManagerModal()">&times;</button>
+            </div>
+            
+            <div class="create-tag-inline-form">
+                <input type="text" id="newTagNameInput" class="input-tag-text" placeholder="Nhập tên thể loại mới (Ví dụ: Pop, Rock...)">
+                <button type="button" class="btn-submit-new-tag" onclick="apiCreateNewTag()">✨ Thêm Tag</button>
+            </div>
+
+            <div id="modalTagBodyList" style="max-height: 280px; overflow-y: auto; padding-right: 2px;">
+                <p style="color: var(--text-muted); text-align: center; font-size: 13.5px; padding: 15px 0;">Đang kết nối dữ liệu...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let globalActiveSongId = null;
+
+        function openTagManagerModal(maBaiHat) {
+            globalActiveSongId = maBaiHat;
+            const songTitleText = document.getElementById(`song-title-${maBaiHat}`).textContent;
+            document.getElementById('modalSongNameDisplay').textContent = `🏷️ Thể loại: ${songTitleText}`;
+            
+            document.getElementById('tagManagerModal').style.display = 'flex';
+            document.getElementById('newTagNameInput').value = '';
+            
+            loadTagsFromServer(maBaiHat);
+        }
+
+        function closeTagManagerModal() {
+            document.getElementById('tagManagerModal').style.display = 'none';
+            globalActiveSongId = null;
+        }
+
+        function handleOutsideModalClick(e) {
+            if (e.target.id === "tagManagerModal") {
+                closeTagManagerModal();
+            }
+        }
+
+        function loadTagsFromServer(maBaiHat) {
+            const container = document.getElementById('modalTagBodyList');
+
+            fetch(`/admin/bai-hat/${maBaiHat}/tags`)
+            .then(res => res.json())
+            .then(data => {
+                container.innerHTML = '';
+                if(data.length === 0) {
+                    container.innerHTML = '<p style="color: var(--text-muted); text-align: center; font-size: 13.5px; padding: 15px 0;">Không có dữ liệu tag.</p>';
+                    return;
+                }
+
+                data.forEach(tag => {
+                    let actionBtn = '';
+                    if(tag.dangDuocGan) {
+                        actionBtn = `<button type="button" class="action-tag-mini-btn remove-mode" onclick="apiRemoveTag(${tag.maTag})">🗑️ Gỡ bỏ</button>`;
+                    } else {
+                        actionBtn = `<button type="button" class="action-tag-mini-btn add-mode" onclick="apiAddTag(${tag.maTag})">➕ Gán vào</button>`;
+                    }
+
+                    // 🌟 THAY ĐỔI: Thêm nút thùng rác nhỏ (❌) để kích hoạt hàm xóa vĩnh viễn hệ thống
+                    const itemHtml = `
+                        <div class="tag-row-item">
+                            <div class="tag-left-info">
+                                <button type="button" class="btn-system-delete-tag" onclick="apiSystemDeleteTag(${tag.maTag}, '${tag.tenTag}')" title="Xóa vĩnh viễn thể loại này">❌</button>
+                                <span class="tag-name-label">${tag.tenTag}</span>
+                                <span class="tag-inner-badge">Vote: ${tag.soVote}</span>
+                            </div>
+                            <div>${actionBtn}</div>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', itemHtml);
+                });
+            })
+            .catch(() => {
+                container.innerHTML = '<p style="color: var(--danger); text-align: center; font-size: 13.5px; padding: 15px 0;">Lỗi kết nối API!</p>';
+            });
+        }
+
+        function apiCreateNewTag() {
+            const inputEl = document.getElementById('newTagNameInput');
+            const tenTagValue = inputEl.value.trim();
+            
+            if(!tenTagValue) {
+                alert('Vui lòng điền tên Thể loại / Tag muốn tạo!');
+                return;
+            }
+
+            const form = new FormData();
+            form.append('tenTag', tenTagValue);
+
+            fetch('/admin/them-tag-moi', { method: 'POST', body: form })
+            .then(res => {
+                if(!res.ok) throw new Error();
+                return res.json();
+            })
+            .then(resData => {
+                if(resData.success) {
+                    inputEl.value = '';
+                    if(globalActiveSongId) loadTagsFromServer(globalActiveSongId);
+                } else {
+                    alert(resData.message || 'Tag đã tồn tại hoặc không hợp lệ!');
+                }
+            })
+            .catch(() => alert('Lỗi hệ thống khi tạo Tag mới!'));
+        }
+
+        // 🌟 HÀM XỬ LÝ MỚI: Gửi request AJAX yêu cầu xóa bỏ hoàn toàn Tag khỏi Database
+        function apiSystemDeleteTag(maTag, tenTag) {
+            if(!confirm(`⚠️ CHÚ Ý: Bạn có chắc chắn muốn XÓA VĨNH VIỄN thể loại "${tenTag}" ra khỏi hệ thống không?\nHành động này cũng sẽ xóa toàn bộ liên kết và lượt vote của thể loại này ở tất cả các bài hát.`)) {
+                return;
+            }
+
+            const form = new FormData();
+            form.append('maTag', maTag);
+
+            fetch('/admin/xoa-tag-vinh-vien', { method: 'POST', body: form })
+            .then(res => res.json())
+            .then(resData => {
+                if(resData.success) {
+                    // Tải lại danh sách tag trong modal ngay lập tức
+                    if(globalActiveSongId) loadTagsFromServer(globalActiveSongId);
+                } else {
+                    alert(resData.message || 'Không thể xóa thể loại này!');
+                }
+            })
+            .catch(() => alert('Lỗi kết nối khi gửi lệnh xóa Tag!'));
+        }
+
+        function apiAddTag(maTag) {
+            if(!globalActiveSongId) return;
+            const form = new FormData();
+            form.append('maBaiHat', globalActiveSongId);
+            form.append('maTag', maTag);
+
+            fetch('/admin/bai-hat/them-tag', { method: 'POST', body: form })
+            .then(res => res.json())
+            .then(resData => {
+                if(resData.success) loadTagsFromServer(globalActiveSongId);
+            });
+        }
+
+        function apiRemoveTag(maTag) {
+            if(!globalActiveSongId) return;
+            if(!confirm('Xác nhận gỡ thể loại này khỏi bài hát?')) return;
+
+            const form = new FormData();
+            form.append('maBaiHat', globalActiveSongId);
+            form.append('maTag', maTag);
+
+            fetch('/admin/bai-hat/xoa-tag', { method: 'POST', body: form })
+            .then(res => res.json())
+            .then(resData => {
+                if(resData.success) loadTagsFromServer(globalActiveSongId);
+            });
+        }
+    </script>
 </body>
 </html>

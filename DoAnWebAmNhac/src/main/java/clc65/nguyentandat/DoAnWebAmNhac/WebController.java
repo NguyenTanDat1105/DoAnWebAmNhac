@@ -2,6 +2,7 @@ package clc65.nguyentandat.DoAnWebAmNhac;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.transaction.annotation.Transactional;
 
 import clc65.nguyentandat.DoAnWebAmNhac.Repository.BaiHatRepository;
 import clc65.nguyentandat.DoAnWebAmNhac.Repository.NguoiDungRepository;
@@ -232,6 +234,134 @@ public class WebController {
     }
 
     // ==========================================
+    // ✨ CẬP NHẬT MỚI: CÁC API DÀNH RIÊNG CHO ADMIN QUẢN LÝ TAG QUA AJAX
+    // ==========================================
+    
+    @PostMapping("/admin/them-tag-moi")
+    @ResponseBody
+    public ResponseEntity<?> adminThemTagMoiVaoHeThong(@RequestParam("tenTag") String tenTag, HttpSession session) {
+        NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
+        if (userLogged == null || userLogged.getPhanQuyen() != 2) {
+            return ResponseEntity.status(403).body("Từ chối truy cập: Bạn không có quyền!");
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        if (tenTag == null || tenTag.trim().isEmpty()) {
+            response.put("success", false);
+            response.put("message", "Tên thể loại không được để trống!");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+            String cleanTagName = tenTag.trim();
+            clc65.nguyentandat.DoAnWebAmNhac.Entity.Tag newTag = new clc65.nguyentandat.DoAnWebAmNhac.Entity.Tag();
+            newTag.setTenTag(cleanTagName);
+            tagRepository.save(newTag);
+            
+            response.put("success", true);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Lỗi lưu Database: Thể loại có thể đã tồn tại!");
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    // 🌟 CHỨC NĂNG MỚI BỔ SUNG: Xóa hoàn toàn một danh mục Tag khỏi Database hệ thống
+    @PostMapping("/admin/xoa-tag-vinh-vien")
+    @ResponseBody
+    @Transactional // Đảm bảo tính toàn vẹn dữ liệu khi xóa ở nhiều bảng dữ liệu
+    public ResponseEntity<?> adminXoaTagVinhVienKhoiHeThong(@RequestParam("maTag") Integer maTag, HttpSession session) {
+        NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
+        if (userLogged == null || userLogged.getPhanQuyen() != 2) {
+            return ResponseEntity.status(403).body("Từ chối truy cập: Bạn không có quyền Admin!");
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // Bước 1: Xóa các lượt bình chọn liên quan tới Tag này trong bảng trung gian trước
+            tagVoteRepository.deleteByMaTag(maTag); 
+            
+            // Bước 2: Xóa trực tiếp danh mục định nghĩa Tag đó trong bảng chính
+            tagRepository.deleteById(maTag);
+            
+            response.put("success", true);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "Lỗi hệ thống khi thực hiện xóa thể loại: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @GetMapping("/admin/bai-hat/{id}/tags")
+    @ResponseBody
+    public ResponseEntity<?> layDanhSachTagCuaBaiHat(@PathVariable("id") Integer maBaiHat, HttpSession session) {
+        NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
+        if (userLogged == null || userLogged.getPhanQuyen() != 2) {
+            return ResponseEntity.status(403).body("Từ chối truy cập: Bạn không phải Admin!");
+        }
+
+        List<clc65.nguyentandat.DoAnWebAmNhac.Entity.Tag> tatCaTags = tagRepository.findAll();
+        List<Map<String, Object>> danhSachKetQua = new ArrayList<>();
+        
+        for (clc65.nguyentandat.DoAnWebAmNhac.Entity.Tag tag : tatCaTags) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("maTag", tag.getMaTag());
+            item.put("tenTag", tag.getTenTag());
+            
+            int soVote = tagVoteRepository.countByMaBaiHatAndMaTag(maBaiHat, tag.getMaTag());
+            item.put("soVote", soVote);
+            item.put("dangDuocGan", soVote > 0); 
+            
+            danhSachKetQua.add(item);
+        }
+        return ResponseEntity.ok(danhSachKetQua);
+    }
+
+    @PostMapping("/admin/bai-hat/them-tag")
+    @ResponseBody
+    public ResponseEntity<?> adminThemTagChoBaiHat(@RequestParam("maBaiHat") Integer maBaiHat,
+                                                   @RequestParam("maTag") Integer maTag,
+                                                   HttpSession session) {
+        NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
+        if (userLogged == null || userLogged.getPhanQuyen() != 2) {
+            return ResponseEntity.status(403).body("Bạn không có quyền thực hiện hành động này!");
+        }
+
+        TagVote adminVote = new TagVote();
+        adminVote.setMaBaiHat(maBaiHat);
+        adminVote.setMaTag(maTag);
+        adminVote.setMaNguoiDung(userLogged.getMaNguoiDung());
+        adminVote.setNgayVote(LocalDateTime.now());
+        tagVoteRepository.save(adminVote);
+
+        int soVoteMoi = tagVoteRepository.countByMaBaiHatAndMaTag(maBaiHat, maTag);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("newVoteCount", soVoteMoi);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/admin/bai-hat/xoa-tag")
+    @ResponseBody
+    public ResponseEntity<?> adminXoaTagKhoiBaiHat(@RequestParam("maBaiHat") Integer maBaiHat,
+                                                   @RequestParam("maTag") Integer maTag,
+                                                   HttpSession session) {
+        NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
+        if (userLogged == null || userLogged.getPhanQuyen() != 2) {
+            return ResponseEntity.status(403).body("Bạn không có quyền thực hiện hành động này!");
+        }
+
+        tagVoteRepository.deleteByMaBaiHatAndMaTag(maBaiHat, maTag);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        return ResponseEntity.ok(response);
+    }
+
+    // ==========================================
     // 4. CHỨC NĂNG ĐĂNG KÝ TÀI KHOẢN
     // ==========================================
     @GetMapping("/dang-ky")
@@ -292,7 +422,7 @@ public class WebController {
     }
     
     // ==========================================
-    // ✨ 6. XỬ LÝ BÌNH CHỌN (VOTE) THỂ LOẠI QUA AJAX (CẬP NHẬT: TOGGLE VOTE / UNVOTE)
+    // 6. XỬ LÝ BÌNH CHỌN (VOTE) THỂ LOẠI QUA AJAX
     // ==========================================
     @PostMapping("/vote-the-loai")
     @ResponseBody
@@ -307,33 +437,27 @@ public class WebController {
             return ResponseEntity.status(401).body("Bạn chưa đăng nhập!");
         }
 
-        // Bước 1: Kiểm tra xem người dùng hiện tại đã bình chọn cho tag này tại bài hát này chưa
         TagVote voteDaTonTai = tagVoteRepository.findByMaBaiHatAndMaTagAndMaNguoiDung(maBaiHat, maTag, userLogged.getMaNguoiDung());
-        
         boolean currentVotedStatus;
         
         if (voteDaTonTai != null) {
-            // 👉 NẾU ĐÃ VOTE -> Người dùng nhấn lần 2 -> Tiến hành HỦY VOTE (Xóa khỏi CSDL)
             tagVoteRepository.delete(voteDaTonTai);
-            currentVotedStatus = false; // Trạng thái hiện tại: Đã bỏ chọn
+            currentVotedStatus = false; 
         } else {
-            // 👉 NẾU CHƯA VOTE -> Người dùng nhấn lần 1 -> Tiến hành THÊM MỚI lượt vote vào CSDL
             TagVote voteMoi = new TagVote();
             voteMoi.setMaBaiHat(maBaiHat);
             voteMoi.setMaTag(maTag);
             voteMoi.setMaNguoiDung(userLogged.getMaNguoiDung()); 
             voteMoi.setNgayVote(LocalDateTime.now());
             tagVoteRepository.save(voteMoi); 
-            currentVotedStatus = true; // Trạng thái hiện tại: Đã chọn
+            currentVotedStatus = true; 
         }
 
-        // Bước 2: Đếm lại tổng số lượt bình chọn mới nhất của Tag này đối với bài hát
         int tongSoVoteMoi = tagVoteRepository.countByMaBaiHatAndMaTag(maBaiHat, maTag);
 
-        // Bước 3: Gửi dữ liệu JSON phản hồi chính xác về cho JavaScript xử lý giao diện
         response.put("success", true);
-        response.put("voted", currentVotedStatus); // Trả về true (Vừa kích hoạt) hoặc false (Vừa hủy)
-        response.put("newVoteCount", tongSoVoteMoi); // Con số tổng số lượt vote mới nhất
+        response.put("voted", currentVotedStatus); 
+        response.put("newVoteCount", tongSoVoteMoi); 
         
         return ResponseEntity.ok(response);
     }
@@ -372,7 +496,7 @@ public class WebController {
     }
 
     // ==========================================
-    // 8. XỬ LÝ THÍCH BÌNH LUẬN QUA AJAX (TOGGLE LIKE / UNLIKE)
+    // 8. XỬ LÝ THÍCH BÌNH LUẬN QUA AJAX
     // ==========================================
     @PostMapping("/vote-binh-luan")
     @ResponseBody 
@@ -409,8 +533,9 @@ public class WebController {
         
         return ResponseEntity.ok(response);
     }
+
     // ==========================================
-    // ✨ 9. XỬ LÝ SỬA BÌNH LUẬN QUA AJAX (CHỈ CHÍNH CHỦ)
+    // 9. XỬ LÝ SỬA BÌNH LUẬN QUA AJAX
     // ==========================================
     @PostMapping("/sua-binh-luan")
     @ResponseBody
@@ -432,7 +557,6 @@ public class WebController {
             return ResponseEntity.status(404).body("Không tìm thấy bình luận cần sửa!");
         }
 
-        // KIỂM TRA QUYỀN: Chỉ có người viết ra bình luận đó mới được quyền sửa
         if (!bl.getMaNguoiDung().equals(userLogged.getMaNguoiDung())) {
             return ResponseEntity.status(403).body("Bạn không có quyền sửa bình luận này!");
         }
@@ -446,7 +570,7 @@ public class WebController {
     }
 
     // ==========================================
-    // ✨ 10. XỬ LÝ XÓA BÌNH LUẬN QUA AJAX (CHÍNH CHỦ HOẶC ADMIN)
+    // 10. XỬ LÝ XÓA BÌNH LUẬN QUA AJAX
     // ==========================================
     @PostMapping("/xoa-binh-luan")
     @ResponseBody
@@ -464,16 +588,12 @@ public class WebController {
             return ResponseEntity.status(404).body("Không tìm thấy bình luận!");
         }
 
-        // KIỂM TRA QUYỀN: Phải là Người viết bình luận HOẶC là Admin (phanQuyen == 2)
         if (!bl.getMaNguoiDung().equals(userLogged.getMaNguoiDung()) && userLogged.getPhanQuyen() != 2) {
             return ResponseEntity.status(403).body("Bạn không có quyền xóa bình luận này!");
         }
 
         try {
-            // 1. Xóa sạch các dữ liệu liên quan ở bảng liên kết (BinhLuanVote) tránh lỗi Foreign Key
             binhLuanVoteRepository.deleteByMaBinhLuan(maBinhLuan);
-            
-            // 2. Tiến hành xóa bình luận chính thức
             binhLuanRepository.delete(bl);
             
             response.put("success", true);

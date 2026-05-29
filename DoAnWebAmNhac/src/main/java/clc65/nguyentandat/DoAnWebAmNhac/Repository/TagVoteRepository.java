@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import clc65.nguyentandat.DoAnWebAmNhac.Entity.TagVote;
+import jakarta.transaction.Transactional;
 
 @Repository
 public interface TagVoteRepository extends JpaRepository<TagVote, Integer>{
@@ -14,4 +15,8 @@ public interface TagVoteRepository extends JpaRepository<TagVote, Integer>{
     TagVote findByMaBaiHatAndMaNguoiDung(Integer maBaiHat, Integer maNguoiDung);
     
     TagVote findByMaBaiHatAndMaTagAndMaNguoiDung(Integer maBaiHat, Integer maTag, Integer maNguoiDung);
+    
+    @Transactional
+    void deleteByMaBaiHatAndMaTag(Integer maBaiHat, Integer maTag);
+    void deleteByMaTag(Integer maTag);
 }
