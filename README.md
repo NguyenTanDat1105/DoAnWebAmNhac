@@ -1,6 +1,6 @@
 # 🎵 Nền Tảng Phát Nhạc Trực Tuyến (Muse Zone)
 ## Link demo dự án : 
-👉 [Bấm vào đây để xem video demo dự án]([https://drive.google.com/file/d/1DvRrO9rTW32hcVg4-xMwk8b6e-aNbnkl/view?usp=sharing](https://drive.google.com/file/d/1sIoJK17azBvY9boOk3gFyBS_6LZP0nGL/view?usp=drive_link))
+👉 [Bấm vào đây để xem video demo dự án]([https://drive.google.com/file/d/1sIoJK17azBvY9boOk3gFyBS_6LZP0nGL/view?usp=drive_link])
 
 ---
 
