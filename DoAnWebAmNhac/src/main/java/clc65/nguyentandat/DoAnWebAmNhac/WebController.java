@@ -270,7 +270,7 @@ public class WebController {
     // 🌟 CHỨC NĂNG MỚI BỔ SUNG: Xóa hoàn toàn một danh mục Tag khỏi Database hệ thống
     @PostMapping("/admin/xoa-tag-vinh-vien")
     @ResponseBody
-    @Transactional // Đảm bảo tính toàn vẹn dữ liệu khi xóa ở nhiều bảng dữ liệu
+    @Transactional 
     public ResponseEntity<?> adminXoaTagVinhVienKhoiHeThong(@RequestParam("maTag") Integer maTag, HttpSession session) {
         NguoiDung userLogged = (NguoiDung) session.getAttribute("userLogged");
         if (userLogged == null || userLogged.getPhanQuyen() != 2) {
