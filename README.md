@@ -22,8 +22,9 @@ Dự án được phát triển dựa trên nền tảng Java Full-Stack kết h
 Hệ thống được chia làm các luồng chức năng với quyền hạn phân cấp rõ ràng:
 
 * **🔐 Đăng nhập & Phân quyền (Authentication & Authorization):**
-    * `Quản trị viên (Admin)`: Nắm toàn quyền hệ thống. Được phép quản lý người dùng, phê duyệt bài hát, và quản trị danh mục nhãn thẻ (tag).
-    * `Người dùng (User)`: Được phép nghe nhạc, đăng tải bài hát mới (chờ duyệt), bình luận và tham gia bình chọn phân loại nhạc.
+    * `Quản trị viên (Admin)`: Nắm toàn quyền hệ thống. Được phép quản lý người dùng, và quản trị danh mục nhãn thẻ (tag).
+    * `Người dùng (User)`: Được phép nghe nhạc, bình luận và tham gia bình chọn phân loại nhạc.
+    * `Nghệ sĩ (Artist)`: Có các chức năng của Người dùng và có chứng năng tải bài hát lên.
 
 * **🎧 Trải nghiệm Âm nhạc (Music Experience):**
     * Tìm kiếm và xem danh sách bài hát với giao diện lưới (grid) trực quan.
@@ -45,17 +46,17 @@ Hệ thống được chia làm các luồng chức năng với quyền hạn ph
 *Dưới đây là các hình ảnh minh họa giao diện, bạn có thể bổ sung các file ảnh này vào thư mục `images/` trong kho lưu trữ của mình.*
 
 * **Trang Đăng nhập & Đăng ký:**
-    ![Giao diện Đăng nhập](images/login.png)
-    ![Giao diện Đăng ký](images/register.png)
+    ![Giao diện Đăng nhập](images/login.jpg)
+    ![Giao diện Đăng ký](images/register.jpg)
 * **Trang Chủ Hệ Thống (Dark Mode):**
-    ![Trang chủ](images/home.png)
-* **Giao diện Chi tiết bài hát & Nghe nhạc:**
-    ![Nghe nhạc](images/play-music.png)
+    ![Trang chủ](images/home.jpg)
+* **Giao diện Nghe nhạc:**
+    ![Nghe nhạc](images/play-music.jpg)
 * **Form Thêm bài hát mới:**
-    ![Thêm bài hát](images/add-song.png)
+    ![Thêm bài hát](images/add-song.jpg)
 * **Giao diện Hệ thống Quản trị viên (Admin):**
-    ![Danh sách bài hát Admin](images/admin-dashboard.png)
-    ![Quản lý Tag](images/admin-tags.png)
+    ![Danh sách bài hát Admin](images/admin-dashboard.jpg)
+    ![Quản lý Tag](images/admin-tags.jpg)
 
 ---
 
